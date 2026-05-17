@@ -1,4 +1,4 @@
-﻿﻿﻿﻿<!doctype html>
+﻿﻿﻿﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -1112,6 +1112,14 @@
                     <select id="posterAway"></select>
                   </div>
                   <div class="field">
+                    <label for="posterHomeLogo">Ev sahibi logo adresi</label>
+                    <input id="posterHomeLogo" type="text" placeholder="https://.../logo.png">
+                  </div>
+                  <div class="field">
+                    <label for="posterAwayLogo">Deplasman logo adresi</label>
+                    <input id="posterAwayLogo" type="text" placeholder="https://.../logo.png">
+                  </div>
+                  <div class="field">
                     <label for="posterDate">Tarih</label>
                     <input id="posterDate" type="text" placeholder="22 MAYIS 2026">
                   </div>
@@ -1252,6 +1260,8 @@
         matchIndex: 0,
         home: "AC MİLAN",
         away: "GALATASARAY",
+        homeLogo: "",
+        awayLogo: "",
         date: "",
         time: "",
         stadium: "",
@@ -1286,6 +1296,8 @@
         posterControls: document.getElementById("posterControls"),
         posterHome: document.getElementById("posterHome"),
         posterAway: document.getElementById("posterAway"),
+        posterHomeLogo: document.getElementById("posterHomeLogo"),
+        posterAwayLogo: document.getElementById("posterAwayLogo"),
         posterDate: document.getElementById("posterDate"),
         posterTime: document.getElementById("posterTime"),
         posterStadium: document.getElementById("posterStadium"),
@@ -1311,6 +1323,7 @@
 
       let activeSubmit = null;
       let toastTimer = null;
+      const logoImageCache = new Map();
 
       function load(key, fallback) {
         return structuredClone(fallback);
@@ -1361,6 +1374,7 @@
           state.transfers = data.transfers || state.transfers;
           state.season = { ...defaultSeason, ...(data.season || {}) };
           state.fixturePoster = { ...defaultFixturePoster, ...(data.fixturePoster || {}) };
+          ensureTeamLogos();
         } catch (error) {
           showToast(error.message || "Sunucudan veri alınamadı.");
         }
@@ -1420,6 +1434,14 @@
 
       function getTeamByName(name) {
         return state.teams.find((team) => team.team === name);
+      }
+
+      function ensureTeamLogos() {
+        const defaultLogoMap = Object.fromEntries(defaultTeams.map((team) => [team.team, team.logo]));
+        state.teams = state.teams.map((team) => ({
+          ...team,
+          logo: team.logo || defaultLogoMap[team.team] || ""
+        }));
       }
 
       function logoMarkup(teamName, className = "club-logo") {
@@ -1485,6 +1507,7 @@
         state.teams = state.teams.map(normalizeTeam);
         state.news = Array.isArray(state.news) ? state.news : defaultNews;
         state.liveMatchIndex = Number.isInteger(state.liveMatchIndex) ? state.liveMatchIndex : 0;
+        ensureTeamLogos();
         save("league_teams", state.teams);
         state.stats = { ...defaultStats, ...state.stats };
         state.season = { ...defaultSeason, ...state.season };
@@ -1654,12 +1677,14 @@
         const poster = currentPoster();
         elements.posterHome.value = poster.home;
         elements.posterAway.value = poster.away;
+        elements.posterHomeLogo.value = poster.homeLogo;
+        elements.posterAwayLogo.value = poster.awayLogo;
         elements.posterDate.value = poster.date;
         elements.posterTime.value = poster.time;
         elements.posterStadium.value = poster.stadium;
         elements.posterNote.value = poster.note;
         elements.posterLayout.value = poster.layout;
-        [elements.posterHome, elements.posterAway, elements.posterDate, elements.posterTime, elements.posterStadium, elements.posterNote, elements.posterLayout].forEach((field) => {
+        [elements.posterHome, elements.posterAway, elements.posterHomeLogo, elements.posterAwayLogo, elements.posterDate, elements.posterTime, elements.posterStadium, elements.posterNote, elements.posterLayout].forEach((field) => {
           field.disabled = !state.isAdmin;
         });
         drawFixturePoster();
@@ -1674,6 +1699,8 @@
           matchIndex: state.matches[matchIndex] ? matchIndex : 0,
           home,
           away,
+          homeLogo: state.fixturePoster.homeLogo || getTeamByName(home)?.logo || "",
+          awayLogo: state.fixturePoster.awayLogo || getTeamByName(away)?.logo || "",
           date: state.fixturePoster.date || dateLabel(state.season.startDate).toUpperCase(),
           time: state.fixturePoster.time || match.time || "20:00",
           stadium: state.fixturePoster.stadium || match.stadium || "STADYUM",
@@ -1682,8 +1709,8 @@
         };
       }
 
-      function drawRoundLogo(ctx, teamName, x, y, radius) {
-        const team = getTeamByName(teamName) || { team: teamName };
+      function drawRoundLogo(ctx, teamName, x, y, radius, logoOverride = "") {
+        const team = { ...(getTeamByName(teamName) || { team: teamName }), logo: logoOverride || getTeamByName(teamName)?.logo || "" };
         const gradient = ctx.createLinearGradient(x - radius, y - radius, x + radius, y + radius);
         gradient.addColorStop(0, "#2a0d13");
         gradient.addColorStop(0.55, "#e23b4a");
@@ -1700,12 +1727,35 @@
         ctx.lineWidth = 8;
         ctx.strokeStyle = "rgba(255,255,255,0.82)";
         ctx.stroke();
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "900 54px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(initials(team.team), x, y + 2);
+
+        const logoImage = getLogoImage(team);
+        if (logoImage && logoImage.complete && logoImage.naturalWidth) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(x, y, radius - 10, 0, Math.PI * 2);
+          ctx.clip();
+          ctx.drawImage(logoImage, x - radius + 10, y - radius + 10, (radius - 10) * 2, (radius - 10) * 2);
+          ctx.restore();
+        } else {
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "900 54px Arial";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(initials(team.team), x, y + 2);
+        }
         ctx.restore();
+      }
+
+      function getLogoImage(team) {
+        if (!team.logo) return null;
+        if (logoImageCache.has(team.logo)) return logoImageCache.get(team.logo);
+        const image = new Image();
+        image.crossOrigin = "anonymous";
+        image.onload = () => drawFixturePoster();
+        image.onerror = () => logoImageCache.delete(team.logo);
+        image.src = team.logo;
+        logoImageCache.set(team.logo, image);
+        return image;
       }
 
       function drawCenteredText(ctx, text, x, y, maxWidth, size, color = "#ffffff") {
@@ -1797,8 +1847,8 @@
         };
         const layout = layouts[poster.layout] || layouts.template;
 
-        drawRoundLogo(ctx, poster.home, 250, layout.logoY, 90);
-        drawRoundLogo(ctx, poster.away, 830, layout.logoY, 90);
+        drawRoundLogo(ctx, poster.home, 250, layout.logoY, 90, poster.homeLogo);
+        drawRoundLogo(ctx, poster.away, 830, layout.logoY, 90, poster.awayLogo);
         drawCenteredText(ctx, poster.home, 250, layout.nameY, 350, 34, "#ffffff");
         drawCenteredText(ctx, poster.away, 830, layout.nameY, 350, 34, "#ffffff");
 
@@ -2286,6 +2336,8 @@
           ),
           home: elements.posterHome.value,
           away: elements.posterAway.value,
+          homeLogo: elements.posterHomeLogo.value.trim(),
+          awayLogo: elements.posterAwayLogo.value.trim(),
           date: elements.posterDate.value.trim(),
           time: elements.posterTime.value.trim(),
           stadium: elements.posterStadium.value.trim(),
@@ -2303,12 +2355,14 @@
         link.click();
       });
 
-      [elements.posterHome, elements.posterAway, elements.posterDate, elements.posterTime, elements.posterStadium, elements.posterNote, elements.posterLayout].forEach((field) => {
+      [elements.posterHome, elements.posterAway, elements.posterHomeLogo, elements.posterAwayLogo, elements.posterDate, elements.posterTime, elements.posterStadium, elements.posterNote, elements.posterLayout].forEach((field) => {
         field.addEventListener("input", () => {
           state.fixturePoster = {
             ...state.fixturePoster,
             home: elements.posterHome.value,
             away: elements.posterAway.value,
+            homeLogo: elements.posterHomeLogo.value.trim(),
+            awayLogo: elements.posterAwayLogo.value.trim(),
             date: elements.posterDate.value.trim(),
             time: elements.posterTime.value.trim(),
             stadium: elements.posterStadium.value.trim(),
@@ -2322,6 +2376,8 @@
             ...state.fixturePoster,
             home: elements.posterHome.value,
             away: elements.posterAway.value,
+            homeLogo: elements.posterHomeLogo.value.trim(),
+            awayLogo: elements.posterAwayLogo.value.trim(),
             date: elements.posterDate.value.trim(),
             time: elements.posterTime.value.trim(),
             stadium: elements.posterStadium.value.trim(),

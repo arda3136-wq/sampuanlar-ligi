@@ -1,4 +1,4 @@
-﻿﻿<!doctype html>
+﻿﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -1127,6 +1127,14 @@
                     <label for="posterNote">Üst Not</label>
                     <input id="posterNote" type="text" placeholder="Fikstür">
                   </div>
+                  <div class="field">
+                    <label for="posterLayout">Yazı Konumu</label>
+                    <select id="posterLayout">
+                      <option value="template">Şablonun Üstüne Yaz</option>
+                      <option value="lower">Daha Aşağı Al</option>
+                      <option value="center">Ortaya Topla</option>
+                    </select>
+                  </div>
                   <button id="savePosterButton" class="button" type="button">Görseli Güncelle</button>
                   <button id="downloadPosterButton" class="button secondary" type="button">PNG İndir</button>
                 </div>
@@ -1247,7 +1255,8 @@
         date: "",
         time: "",
         stadium: "",
-        note: "Fikstür"
+        note: "Fikstür",
+        layout: "template"
       };
 
       const state = {
@@ -1281,6 +1290,7 @@
         posterTime: document.getElementById("posterTime"),
         posterStadium: document.getElementById("posterStadium"),
         posterNote: document.getElementById("posterNote"),
+        posterLayout: document.getElementById("posterLayout"),
         savePosterButton: document.getElementById("savePosterButton"),
         downloadPosterButton: document.getElementById("downloadPosterButton"),
         fixturePosterCanvas: document.getElementById("fixturePosterCanvas"),
@@ -1651,7 +1661,8 @@
         elements.posterTime.value = poster.time;
         elements.posterStadium.value = poster.stadium;
         elements.posterNote.value = poster.note;
-        [elements.posterHome, elements.posterAway, elements.posterDate, elements.posterTime, elements.posterStadium, elements.posterNote].forEach((field) => {
+        elements.posterLayout.value = poster.layout;
+        [elements.posterHome, elements.posterAway, elements.posterDate, elements.posterTime, elements.posterStadium, elements.posterNote, elements.posterLayout].forEach((field) => {
           field.disabled = !state.isAdmin;
         });
         drawFixturePoster();
@@ -1669,7 +1680,8 @@
           date: state.fixturePoster.date || dateLabel(state.season.startDate).toUpperCase(),
           time: state.fixturePoster.time || match.time || "20:00",
           stadium: state.fixturePoster.stadium || match.stadium || "STADYUM",
-          note: state.fixturePoster.note || "Fikstür"
+          note: state.fixturePoster.note || "Fikstür",
+          layout: state.fixturePoster.layout || "template"
         };
       }
 
@@ -1740,22 +1752,29 @@
           ctx.fillRect(0, 0, 1080, 1080);
         }
 
-        drawRoundLogo(ctx, poster.home, 250, 455, 90);
-        drawRoundLogo(ctx, poster.away, 830, 455, 90);
-        drawCenteredText(ctx, poster.home, 250, 626, 350, 34, "#ffffff");
-        drawCenteredText(ctx, poster.away, 830, 626, 350, 34, "#ffffff");
+        const layouts = {
+          template: { logoY: 455, nameY: 626, vsY: 434, bandY: 772, infoY: 825 },
+          lower: { logoY: 510, nameY: 686, vsY: 492, bandY: 820, infoY: 872 },
+          center: { logoY: 470, nameY: 650, vsY: 470, bandY: 735, infoY: 790 }
+        };
+        const layout = layouts[poster.layout] || layouts.template;
+
+        drawRoundLogo(ctx, poster.home, 250, layout.logoY, 90);
+        drawRoundLogo(ctx, poster.away, 830, layout.logoY, 90);
+        drawCenteredText(ctx, poster.home, 250, layout.nameY, 350, 34, "#ffffff");
+        drawCenteredText(ctx, poster.away, 830, layout.nameY, 350, 34, "#ffffff");
 
         ctx.fillStyle = "rgba(0,0,0,0.28)";
-        roundRect(ctx, 432, 382, 216, 106, 30);
+        roundRect(ctx, 432, layout.vsY - 52, 216, 106, 30);
         ctx.fill();
-        drawCenteredText(ctx, "VS", 540, 434, 180, 68, "#f4c95d");
+        drawCenteredText(ctx, "VS", 540, layout.vsY, 180, 68, "#f4c95d");
 
         ctx.fillStyle = "rgba(0,0,0,0.42)";
-        roundRect(ctx, 126, 772, 828, 136, 30);
+        roundRect(ctx, 126, layout.bandY, 828, 136, 30);
         ctx.fill();
-        drawCenteredText(ctx, poster.date.toUpperCase(), 302, 825, 260, 26, "#ffffff");
-        drawCenteredText(ctx, poster.time.toUpperCase(), 540, 825, 150, 32, "#f4c95d");
-        drawCenteredText(ctx, poster.stadium.toUpperCase(), 778, 825, 260, 26, "#ffffff");
+        drawCenteredText(ctx, poster.date.toUpperCase(), 302, layout.infoY, 260, 26, "#ffffff");
+        drawCenteredText(ctx, poster.time.toUpperCase(), 540, layout.infoY, 150, 32, "#f4c95d");
+        drawCenteredText(ctx, poster.stadium.toUpperCase(), 778, layout.infoY, 260, 26, "#ffffff");
       }
 
       function roundRect(ctx, x, y, width, height, radius) {
@@ -2220,7 +2239,8 @@
           date: elements.posterDate.value.trim(),
           time: elements.posterTime.value.trim(),
           stadium: elements.posterStadium.value.trim(),
-          note: elements.posterNote.value.trim() || "Fikstür"
+          note: elements.posterNote.value.trim() || "Fikstür",
+          layout: elements.posterLayout.value
         };
         await commitChanges("Fikstür görseli güncellendi.");
       });
@@ -2233,7 +2253,7 @@
         link.click();
       });
 
-      [elements.posterHome, elements.posterAway, elements.posterDate, elements.posterTime, elements.posterStadium, elements.posterNote].forEach((field) => {
+      [elements.posterHome, elements.posterAway, elements.posterDate, elements.posterTime, elements.posterStadium, elements.posterNote, elements.posterLayout].forEach((field) => {
         field.addEventListener("input", () => {
           state.fixturePoster = {
             ...state.fixturePoster,
@@ -2242,7 +2262,8 @@
             date: elements.posterDate.value.trim(),
             time: elements.posterTime.value.trim(),
             stadium: elements.posterStadium.value.trim(),
-            note: elements.posterNote.value.trim() || "Fikstür"
+            note: elements.posterNote.value.trim() || "Fikstür",
+            layout: elements.posterLayout.value
           };
           drawFixturePoster();
         });
@@ -2254,7 +2275,8 @@
             date: elements.posterDate.value.trim(),
             time: elements.posterTime.value.trim(),
             stadium: elements.posterStadium.value.trim(),
-            note: elements.posterNote.value.trim() || "Fikstür"
+            note: elements.posterNote.value.trim() || "Fikstür",
+            layout: elements.posterLayout.value
           };
           drawFixturePoster();
         });

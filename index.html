@@ -699,6 +699,50 @@
         line-height: 1.5;
       }
 
+      .poster-tool {
+        display: grid;
+        grid-template-columns: minmax(280px, 0.95fr) minmax(320px, 1.05fr);
+        align-items: start;
+        gap: 22px;
+      }
+
+      .poster-controls,
+      .poster-preview {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--panel);
+        padding: 22px;
+      }
+
+      .poster-form {
+        display: grid;
+        gap: 12px;
+      }
+
+      select {
+        width: 100%;
+        min-height: 44px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.08);
+        color: white;
+        padding: 10px 12px;
+        outline: none;
+      }
+
+      select:focus {
+        border-color: var(--green);
+        box-shadow: 0 0 0 3px rgba(244, 201, 93, 0.14);
+      }
+
+      .poster-preview canvas {
+        display: block;
+        width: 100%;
+        border-radius: 16px;
+        background: #101014;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+      }
+
       .stats-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -883,6 +927,7 @@
         .stats-grid,
         .news-grid,
         .team-owner-grid,
+        .poster-tool,
         .season-panel,
         .summary-grid,
         .admin-grid {
@@ -1051,6 +1096,48 @@
           <div class="container">
             <div class="section-head">
               <div>
+                <h3>Fikstür Görseli</h3>
+                <p>Paylaşım için 1080x1080 maç posteri</p>
+              </div>
+            </div>
+            <div class="poster-tool">
+              <div id="posterControls" class="poster-controls">
+                <div class="poster-form">
+                  <div class="field">
+                    <label for="posterMatch">Maç</label>
+                    <select id="posterMatch"></select>
+                  </div>
+                  <div class="field">
+                    <label for="posterDate">Tarih</label>
+                    <input id="posterDate" type="text" placeholder="22 MAYIS 2026">
+                  </div>
+                  <div class="field">
+                    <label for="posterTime">Saat</label>
+                    <input id="posterTime" type="text" placeholder="20:00">
+                  </div>
+                  <div class="field">
+                    <label for="posterStadium">Stadyum</label>
+                    <input id="posterStadium" type="text" placeholder="League Arena">
+                  </div>
+                  <div class="field">
+                    <label for="posterNote">Üst Not</label>
+                    <input id="posterNote" type="text" placeholder="Fikstür">
+                  </div>
+                  <button id="savePosterButton" class="button" type="button">Görseli Güncelle</button>
+                  <button id="downloadPosterButton" class="button secondary" type="button">PNG İndir</button>
+                </div>
+              </div>
+              <div class="poster-preview">
+                <canvas id="fixturePosterCanvas" width="1080" height="1080"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-head">
+              <div>
                 <h3>Oyuncu İstatistikleri</h3>
                 <p>Gol, asist ve kart tabloları</p>
               </div>
@@ -1149,6 +1236,14 @@
         endDate: "2026-06-30"
       };
 
+      const defaultFixturePoster = {
+        matchIndex: 0,
+        date: "",
+        time: "",
+        stadium: "",
+        note: "Fikstür"
+      };
+
       const state = {
         teams: load("league_teams", defaultTeams),
         matches: load("league_matches", defaultMatches),
@@ -1157,6 +1252,7 @@
         stats: load("league_stats", defaultStats),
         transfers: load("league_transfers", []),
         season: load("league_season", defaultSeason),
+        fixturePoster: load("league_fixture_poster", defaultFixturePoster),
         teamOwner: sessionStorage.getItem("league_team_owner") || "",
         isAdmin: Boolean(sessionStorage.getItem("league_admin_token"))
       };
@@ -1172,6 +1268,15 @@
         teamOwnerSection: document.getElementById("teamOwnerSection"),
         teamOwnerPanel: document.getElementById("teamOwnerPanel"),
         newsGrid: document.getElementById("newsGrid"),
+        posterControls: document.getElementById("posterControls"),
+        posterMatch: document.getElementById("posterMatch"),
+        posterDate: document.getElementById("posterDate"),
+        posterTime: document.getElementById("posterTime"),
+        posterStadium: document.getElementById("posterStadium"),
+        posterNote: document.getElementById("posterNote"),
+        savePosterButton: document.getElementById("savePosterButton"),
+        downloadPosterButton: document.getElementById("downloadPosterButton"),
+        fixturePosterCanvas: document.getElementById("fixturePosterCanvas"),
         seasonPanel: document.getElementById("seasonPanel"),
         championPanel: document.getElementById("championPanel"),
         seasonSummary: document.getElementById("seasonSummary"),
@@ -1210,7 +1315,8 @@
           news: state.news,
           stats: state.stats,
           transfers: state.transfers,
-          season: state.season
+          season: state.season,
+          fixturePoster: state.fixturePoster
         };
       }
 
@@ -1237,6 +1343,7 @@
           state.stats = { ...defaultStats, ...(data.stats || {}) };
           state.transfers = data.transfers || state.transfers;
           state.season = { ...defaultSeason, ...(data.season || {}) };
+          state.fixturePoster = { ...defaultFixturePoster, ...(data.fixturePoster || {}) };
         } catch (error) {
           showToast(error.message || "Sunucudan veri alınamadı.");
         }
@@ -1256,6 +1363,7 @@
         state.stats = { ...defaultStats, ...(data.stats || state.stats) };
         state.transfers = data.transfers || state.transfers;
         state.season = { ...defaultSeason, ...(data.season || state.season) };
+        state.fixturePoster = { ...defaultFixturePoster, ...(data.fixturePoster || state.fixturePoster) };
       }
 
       async function commitChanges(message) {
@@ -1363,6 +1471,7 @@
         save("league_teams", state.teams);
         state.stats = { ...defaultStats, ...state.stats };
         state.season = { ...defaultSeason, ...state.season };
+        state.fixturePoster = { ...defaultFixturePoster, ...state.fixturePoster };
       }
 
       function updateTeamReferences(oldName, newName) {
@@ -1421,6 +1530,7 @@
         renderSeason();
         renderTeamOwner();
         renderNews();
+        renderFixturePosterTool();
         renderStandings();
         renderChampionAndSummary();
         renderMatches();
@@ -1515,6 +1625,163 @@
             `
           )
           .join("");
+      }
+
+      function renderFixturePosterTool() {
+        elements.posterControls.style.display = state.isAdmin ? "block" : "none";
+        elements.posterMatch.innerHTML = state.matches
+          .map((match, index) => `<option value="${index}">${escapeHtml(match.home)} - ${escapeHtml(match.away)}</option>`)
+          .join("");
+        const poster = currentPoster();
+        elements.posterMatch.value = String(poster.matchIndex);
+        elements.posterDate.value = poster.date;
+        elements.posterTime.value = poster.time;
+        elements.posterStadium.value = poster.stadium;
+        elements.posterNote.value = poster.note;
+        drawFixturePoster();
+      }
+
+      function currentPoster() {
+        const matchIndex = Number.isInteger(state.fixturePoster.matchIndex) ? state.fixturePoster.matchIndex : 0;
+        const match = state.matches[matchIndex] || state.matches[0] || {};
+        return {
+          matchIndex: state.matches[matchIndex] ? matchIndex : 0,
+          date: state.fixturePoster.date || dateLabel(state.season.startDate).toUpperCase(),
+          time: state.fixturePoster.time || match.time || "20:00",
+          stadium: state.fixturePoster.stadium || match.stadium || "STADYUM",
+          note: state.fixturePoster.note || "Fikstür"
+        };
+      }
+
+      function drawRoundLogo(ctx, teamName, x, y, radius) {
+        const team = getTeamByName(teamName) || { team: teamName };
+        const gradient = ctx.createLinearGradient(x - radius, y - radius, x + radius, y + radius);
+        gradient.addColorStop(0, "#2a0d13");
+        gradient.addColorStop(0.55, "#e23b4a");
+        gradient.addColorStop(1, "#f4c95d");
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(x, y, radius + 12, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.11)";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = "rgba(255,255,255,0.82)";
+        ctx.stroke();
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "900 54px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(initials(team.team), x, y + 2);
+        ctx.restore();
+      }
+
+      function drawCenteredText(ctx, text, x, y, maxWidth, size, color = "#ffffff") {
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.font = `900 ${size}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const words = String(text || "").split(" ");
+        const lines = [];
+        let line = "";
+        words.forEach((word) => {
+          const test = line ? `${line} ${word}` : word;
+          if (ctx.measureText(test).width > maxWidth && line) {
+            lines.push(line);
+            line = word;
+          } else {
+            line = test;
+          }
+        });
+        if (line) lines.push(line);
+        lines.slice(0, 2).forEach((item, index) => {
+          ctx.fillText(item, x, y + (index - (Math.min(lines.length, 2) - 1) / 2) * (size + 8));
+        });
+        ctx.restore();
+      }
+
+      function drawFixturePoster() {
+        const canvas = elements.fixturePosterCanvas;
+        const ctx = canvas.getContext("2d");
+        const poster = currentPoster();
+        const match = state.matches[poster.matchIndex] || state.matches[0] || { home: "EV SAHİBİ", away: "DEPLASMAN", score: "VS" };
+
+        const bg = ctx.createLinearGradient(0, 0, 1080, 1080);
+        bg.addColorStop(0, "#090a0f");
+        bg.addColorStop(0.42, "#1b0e17");
+        bg.addColorStop(1, "#090a0f");
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, 1080, 1080);
+
+        const glowRed = ctx.createRadialGradient(160, 120, 0, 160, 120, 440);
+        glowRed.addColorStop(0, "rgba(226,59,74,0.42)");
+        glowRed.addColorStop(1, "rgba(226,59,74,0)");
+        ctx.fillStyle = glowRed;
+        ctx.fillRect(0, 0, 1080, 1080);
+
+        const glowGold = ctx.createRadialGradient(930, 140, 0, 930, 140, 360);
+        glowGold.addColorStop(0, "rgba(244,201,93,0.34)");
+        glowGold.addColorStop(1, "rgba(244,201,93,0)");
+        ctx.fillStyle = glowGold;
+        ctx.fillRect(0, 0, 1080, 1080);
+
+        ctx.strokeStyle = "rgba(255,255,255,0.08)";
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 9; i += 1) {
+          ctx.beginPath();
+          ctx.moveTo(0, 190 + i * 70);
+          ctx.lineTo(1080, 120 + i * 70);
+          ctx.stroke();
+        }
+
+        ctx.fillStyle = "rgba(255,255,255,0.08)";
+        roundRect(ctx, 76, 74, 928, 86, 28);
+        ctx.fill();
+        drawCenteredText(ctx, "ŞAMPUANLAR LİGİ", 540, 118, 780, 48, "#f4c95d");
+        drawCenteredText(ctx, poster.note.toUpperCase(), 540, 204, 680, 30, "rgba(255,255,255,0.78)");
+
+        drawRoundLogo(ctx, match.home, 255, 420, 118);
+        drawRoundLogo(ctx, match.away, 825, 420, 118);
+        drawCenteredText(ctx, match.home, 255, 620, 350, 42, "#ffffff");
+        drawCenteredText(ctx, match.away, 825, 620, 350, 42, "#ffffff");
+
+        ctx.fillStyle = "rgba(255,255,255,0.1)";
+        roundRect(ctx, 438, 342, 204, 150, 34);
+        ctx.fill();
+        drawCenteredText(ctx, match.score || "VS", 540, 416, 180, 72, "#f4c95d");
+
+        ctx.fillStyle = "rgba(0,0,0,0.34)";
+        roundRect(ctx, 116, 752, 848, 176, 34);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(244,201,93,0.35)";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        drawCenteredText(ctx, poster.date.toUpperCase(), 300, 810, 280, 30, "#ffffff");
+        drawCenteredText(ctx, poster.time.toUpperCase(), 540, 810, 180, 34, "#f4c95d");
+        drawCenteredText(ctx, poster.stadium.toUpperCase(), 780, 810, 280, 30, "#ffffff");
+        drawCenteredText(ctx, "TARİH", 300, 875, 220, 22, "rgba(255,255,255,0.52)");
+        drawCenteredText(ctx, "SAAT", 540, 875, 160, 22, "rgba(255,255,255,0.52)");
+        drawCenteredText(ctx, "STADYUM", 780, 875, 220, 22, "rgba(255,255,255,0.52)");
+
+        ctx.fillStyle = "rgba(255,255,255,0.74)";
+        ctx.font = "800 24px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Paylaşım görseli", 540, 994);
+      }
+
+      function roundRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + width, y, x + width, y + height, radius);
+        ctx.arcTo(x + width, y + height, x, y + height, radius);
+        ctx.arcTo(x, y + height, x, y, radius);
+        ctx.arcTo(x, y, x + width, y, radius);
+        ctx.closePath();
       }
 
       function todayKey() {
@@ -1956,6 +2223,26 @@
             await commitChanges("Haber eklendi.");
           }
         );
+      });
+
+      elements.savePosterButton.addEventListener("click", async () => {
+        if (!state.isAdmin) return;
+        state.fixturePoster = {
+          matchIndex: Number(elements.posterMatch.value) || 0,
+          date: elements.posterDate.value.trim(),
+          time: elements.posterTime.value.trim(),
+          stadium: elements.posterStadium.value.trim(),
+          note: elements.posterNote.value.trim() || "Fikstür"
+        };
+        await commitChanges("Fikstür görseli güncellendi.");
+      });
+
+      elements.downloadPosterButton.addEventListener("click", () => {
+        drawFixturePoster();
+        const link = document.createElement("a");
+        link.download = "sampuanlar-ligi-fikstur.png";
+        link.href = elements.fixturePosterCanvas.toDataURL("image/png");
+        link.click();
       });
 
       document.addEventListener("click", async (event) => {

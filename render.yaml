@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: sampuanlar-ligi
+    runtime: node
+    plan: starter
+    buildCommand: ""
+    startCommand: npm start
+    envVars:
+      - key: ADMIN_USER
+        sync: false
+      - key: ADMIN_PASS
+        sync: false
+      - key: ADMIN_SECRET
+        sync: false
+      - key: DATA_DIR
+        value: /var/data
+    disk:
+      name: league-data
+      mountPath: /var/data
+      sizeGB: 1

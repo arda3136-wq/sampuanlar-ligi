@@ -49,6 +49,13 @@ const defaultState = {
   season: {
     startDate: "2026-05-17",
     endDate: "2026-06-30"
+  },
+  fixturePoster: {
+    matchIndex: 0,
+    date: "",
+    time: "",
+    stadium: "",
+    note: "Fikstür"
   }
 };
 
@@ -90,6 +97,10 @@ function normalizeState(input = {}) {
     season: {
       ...defaultState.season,
       ...(input.season && typeof input.season === "object" ? input.season : {})
+    },
+    fixturePoster: {
+      ...defaultState.fixturePoster,
+      ...(input.fixturePoster && typeof input.fixturePoster === "object" ? input.fixturePoster : {})
     }
   });
 }

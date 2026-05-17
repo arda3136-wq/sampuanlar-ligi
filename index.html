@@ -923,8 +923,8 @@
         return structuredClone(fallback);
       }
 
-      function save(key, value) {
-        persistState();
+      async function save() {
+        return persistState();
       }
 
       function adminToken() {
@@ -967,18 +967,26 @@
 
       async function persistState() {
         if (!state.isAdmin) return;
+        const data = await requestJson("/api/state", {
+          method: "POST",
+          headers: { authorization: `Bearer ${adminToken()}` },
+          body: JSON.stringify(publicState())
+        });
+        state.teams = data.teams || state.teams;
+        state.matches = data.matches || state.matches;
+        state.stats = { ...defaultStats, ...(data.stats || state.stats) };
+        state.transfers = data.transfers || state.transfers;
+      }
+
+      async function commitChanges(message) {
         try {
-          const data = await requestJson("/api/state", {
-            method: "POST",
-            headers: { authorization: `Bearer ${adminToken()}` },
-            body: JSON.stringify(publicState())
-          });
-          state.teams = data.teams || state.teams;
-          state.matches = data.matches || state.matches;
-          state.stats = { ...defaultStats, ...(data.stats || state.stats) };
-          state.transfers = data.transfers || state.transfers;
+          await save();
+          showToast(message);
+          render();
         } catch (error) {
           showToast(error.message || "Değişiklik kaydedilemedi.");
+          await loadServerState();
+          render();
         }
       }
 
@@ -1091,9 +1099,6 @@
             team: row.team === oldName ? newName : row.team
           }));
         });
-        save("league_matches", state.matches);
-        save("league_transfers", state.transfers);
-        save("league_stats", state.stats);
       }
 
       function render() {
@@ -1347,11 +1352,9 @@
             { name: "time", label: "Maç saati", value: "20:00", required: true },
             { name: "stadium", label: "Stadyum", value: "League Arena", required: true }
           ],
-          (values) => {
+          async (values) => {
             state.matches.push({ ...values, score: "VS" });
-            save("league_matches", state.matches);
-            showToast("Maç oluşturuldu.");
-            render();
+            await commitChanges("Maç oluşturuldu.");
           }
         );
       });
@@ -1364,11 +1367,9 @@
             { name: "from", label: "Eski takım", required: true },
             { name: "to", label: "Yeni takım", required: true }
           ],
-          (values) => {
+          async (values) => {
             state.transfers.unshift(values);
-            save("league_transfers", state.transfers);
-            showToast("Transfer eklendi.");
-            render();
+            await commitChanges("Transfer eklendi.");
           }
         );
       });
@@ -1396,7 +1397,7 @@
               { name: "goalsAgainst", label: "YG - Yenilen gol", type: "number", value: team.goalsAgainst, required: true },
               { name: "form", label: "Form", value: team.form, required: true }
             ],
-            ({ team: teamName, logo, points, played, wins, draws, losses, goalsFor, goalsAgainst, form }) => {
+            async ({ team: teamName, logo, points, played, wins, draws, losses, goalsFor, goalsAgainst, form }) => {
               const oldName = team.team;
               const newName = teamName.trim();
               state.teams[index] = {
@@ -1413,9 +1414,7 @@
                 form: form || "-----"
               };
               updateTeamReferences(oldName, newName);
-              save("league_teams", state.teams);
-              showToast("Takım güncellendi.");
-              render();
+              await commitChanges("Takım güncellendi.");
             }
           );
         }
@@ -1425,11 +1424,9 @@
           openEditor(
             "Skor Güncelle",
             [{ name: "score", label: "Yeni skor", value: match.score || "VS", required: true }],
-            ({ score }) => {
+            async ({ score }) => {
               state.matches[index] = { ...match, score };
-              save("league_matches", state.matches);
-              showToast("Skor güncellendi.");
-              render();
+              await commitChanges("Skor güncellendi.");
             }
           );
         }
@@ -1460,16 +1457,14 @@
             { name: "team", label: "Takım", value: row.team, required: true },
             { name: "value", label: "Sayı", type: "number", value: row.value, required: true }
           ],
-          ({ player, team, value }) => {
+          async ({ player, team, value }) => {
             const nextRow = { player: player.trim(), team: team.trim(), value: Number(value) };
             if (index === null) {
               state.stats[statKey].push(nextRow);
             } else {
               state.stats[statKey][index] = nextRow;
             }
-            save("league_stats", state.stats);
-            showToast("Oyuncu istatistiği güncellendi.");
-            render();
+            await commitChanges("Oyuncu istatistiği güncellendi.");
           }
         );
       }

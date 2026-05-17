@@ -11,6 +11,7 @@ const TEAM_CODES = parseTeamCodes(process.env.TEAM_CODES);
 const ROOT = __dirname;
 const DATA_DIR = process.env.DATA_DIR || path.join(ROOT, "data");
 const DATA_FILE = path.join(DATA_DIR, "league.json");
+const ASSETS_DIR = path.join(ROOT, "assets");
 const TOKEN_MAX_AGE_MS = 12 * 60 * 60 * 1000;
 
 const defaultState = {
@@ -52,6 +53,8 @@ const defaultState = {
   },
   fixturePoster: {
     matchIndex: 0,
+    home: "AC MİLAN",
+    away: "GALATASARAY",
     date: "",
     time: "",
     stadium: "",
@@ -185,6 +188,24 @@ async function serveIndex(response) {
   response.end(html);
 }
 
+async function serveAsset(assetPath, response) {
+  const safeName = path.basename(assetPath);
+  const filePath = path.join(ASSETS_DIR, safeName);
+  const ext = path.extname(filePath).toLowerCase();
+  const contentTypes = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".webp": "image/webp"
+  };
+  const file = await fs.readFile(filePath);
+  response.writeHead(200, {
+    "content-type": contentTypes[ext] || "application/octet-stream",
+    "cache-control": "public, max-age=3600"
+  });
+  response.end(file);
+}
+
 const server = http.createServer(async (request, response) => {
   try {
     const url = new URL(request.url, `http://${request.headers.host}`);
@@ -240,6 +261,10 @@ const server = http.createServer(async (request, response) => {
 
     if (request.method === "GET" && (url.pathname === "/" || url.pathname === "/index.html")) {
       return serveIndex(response);
+    }
+
+    if (request.method === "GET" && url.pathname.startsWith("/assets/")) {
+      return serveAsset(url.pathname, response);
     }
 
     response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });

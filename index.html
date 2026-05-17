@@ -150,6 +150,12 @@
         color: white;
       }
 
+      .button.ghost-danger {
+        border: 1px solid rgba(255, 86, 86, 0.38);
+        background: rgba(255, 86, 86, 0.12);
+        color: #ff8a8a;
+      }
+
       .button.small {
         min-height: 38px;
         border-radius: 12px;
@@ -222,6 +228,143 @@
       .match-highlight {
         border-radius: 18px;
         padding: clamp(20px, 4vw, 30px);
+      }
+
+      .season-panel,
+      .champion-panel,
+      .summary-panel {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--panel);
+        padding: clamp(20px, 4vw, 30px);
+      }
+
+      .season-panel {
+        display: grid;
+        grid-template-columns: 1.2fr repeat(3, minmax(120px, 0.5fr)) auto;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .season-label {
+        color: rgba(255, 255, 255, 0.54);
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .season-value {
+        margin-top: 5px;
+        font-size: 20px;
+        font-weight: 1000;
+      }
+
+      .champion-panel {
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 22px;
+        background:
+          radial-gradient(circle at 20% 15%, rgba(248, 211, 72, 0.28), transparent 18rem),
+          linear-gradient(135deg, rgba(39, 230, 115, 0.22), rgba(255, 255, 255, 0.06));
+      }
+
+      .champion-panel::before,
+      .champion-panel::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          radial-gradient(circle, #f8d348 0 3px, transparent 4px),
+          radial-gradient(circle, #27e673 0 3px, transparent 4px),
+          radial-gradient(circle, #ff5656 0 2px, transparent 3px),
+          radial-gradient(circle, #4aa3ff 0 2px, transparent 3px);
+        background-position: 8% 12%, 22% 28%, 78% 16%, 88% 42%;
+        background-size: 120px 120px, 150px 150px, 100px 100px, 130px 130px;
+        animation: confettiFall 4s linear infinite;
+        opacity: 0.85;
+      }
+
+      .champion-panel::after {
+        animation-delay: -1.8s;
+        transform: translateY(-80px);
+      }
+
+      @keyframes confettiFall {
+        from {
+          transform: translateY(-90px) rotate(0deg);
+        }
+        to {
+          transform: translateY(180px) rotate(18deg);
+        }
+      }
+
+      .champion-content {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .champion-cup {
+        display: grid;
+        width: 74px;
+        height: 74px;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--yellow);
+        color: var(--black);
+        font-size: 34px;
+        font-weight: 1000;
+      }
+
+      .champion-panel h3 {
+        font-size: clamp(26px, 4vw, 44px);
+        font-weight: 1000;
+      }
+
+      .champion-panel p {
+        margin-top: 8px;
+        color: rgba(255, 255, 255, 0.72);
+        font-weight: 800;
+      }
+
+      .summary-panel {
+        margin-bottom: 22px;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .summary-card {
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.07);
+        padding: 18px;
+      }
+
+      .summary-card h4 {
+        margin-bottom: 12px;
+        font-size: 20px;
+        font-weight: 1000;
+      }
+
+      .summary-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .summary-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        color: rgba(255, 255, 255, 0.78);
+        font-weight: 800;
       }
 
       .card-title-row {
@@ -462,6 +605,10 @@
       }
 
       .score-actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
         margin-top: 12px;
       }
 
@@ -655,6 +802,8 @@
         .match-grid,
         .transfer-grid,
         .stats-grid,
+        .season-panel,
+        .summary-grid,
         .admin-grid {
           grid-template-columns: 1fr;
         }
@@ -757,8 +906,16 @@
           </div>
         </section>
 
+        <section class="section">
+          <div class="container">
+            <div id="seasonPanel" class="season-panel"></div>
+          </div>
+        </section>
+
         <section id="standings" class="section">
           <div class="container">
+            <div id="championPanel"></div>
+            <div id="seasonSummary"></div>
             <div class="section-head">
               <div>
                 <h3>Puan Durumu</h3>
@@ -897,11 +1054,17 @@
         ]
       };
 
+      const defaultSeason = {
+        startDate: "2026-05-17",
+        endDate: "2026-06-30"
+      };
+
       const state = {
         teams: load("league_teams", defaultTeams),
         matches: load("league_matches", defaultMatches),
         stats: load("league_stats", defaultStats),
         transfers: load("league_transfers", []),
+        season: load("league_season", defaultSeason),
         isAdmin: Boolean(sessionStorage.getItem("league_admin_token"))
       };
 
@@ -909,6 +1072,9 @@
         adminButton: document.getElementById("adminButton"),
         addMatchButton: document.getElementById("addMatchButton"),
         addTransferButton: document.getElementById("addTransferButton"),
+        seasonPanel: document.getElementById("seasonPanel"),
+        championPanel: document.getElementById("championPanel"),
+        seasonSummary: document.getElementById("seasonSummary"),
         standingsBody: document.getElementById("standingsBody"),
         matchesGrid: document.getElementById("matchesGrid"),
         statsGrid: document.getElementById("statsGrid"),
@@ -941,7 +1107,8 @@
           teams: state.teams,
           matches: state.matches,
           stats: state.stats,
-          transfers: state.transfers
+          transfers: state.transfers,
+          season: state.season
         };
       }
 
@@ -965,6 +1132,7 @@
           state.matches = data.matches || state.matches;
           state.stats = { ...defaultStats, ...(data.stats || {}) };
           state.transfers = data.transfers || state.transfers;
+          state.season = { ...defaultSeason, ...(data.season || {}) };
         } catch (error) {
           showToast(error.message || "Sunucudan veri alınamadı.");
         }
@@ -981,6 +1149,7 @@
         state.matches = data.matches || state.matches;
         state.stats = { ...defaultStats, ...(data.stats || state.stats) };
         state.transfers = data.transfers || state.transfers;
+        state.season = { ...defaultSeason, ...(data.season || state.season) };
       }
 
       async function commitChanges(message) {
@@ -1084,6 +1253,7 @@
         state.teams = state.teams.map(normalizeTeam);
         save("league_teams", state.teams);
         state.stats = { ...defaultStats, ...state.stats };
+        state.season = { ...defaultSeason, ...state.season };
       }
 
       function updateTeamReferences(oldName, newName) {
@@ -1108,7 +1278,9 @@
 
       function render() {
         renderAdminState();
+        renderSeason();
         renderStandings();
+        renderChampionAndSummary();
         renderMatches();
         renderStats();
         renderTransfers();
@@ -1119,6 +1291,125 @@
         elements.adminButton.className = state.isAdmin ? "button danger" : "button";
         elements.addMatchButton.style.display = state.isAdmin ? "inline-flex" : "none";
         elements.addTransferButton.style.display = state.isAdmin ? "inline-flex" : "none";
+      }
+
+      function todayKey() {
+        return new Date().toISOString().slice(0, 10);
+      }
+
+      function dateLabel(value) {
+        if (!value) return "Tarih yok";
+        return new Date(`${value}T12:00:00`).toLocaleDateString("tr-TR", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric"
+        });
+      }
+
+      function seasonStatus() {
+        const today = todayKey();
+        if (state.season.startDate && today < state.season.startDate) return "Yakında";
+        if (state.season.endDate && today > state.season.endDate) return "Bitti";
+        return "Devam Ediyor";
+      }
+
+      function remainingText() {
+        if (!state.season.endDate) return "Bitiş tarihi yok";
+        const end = new Date(`${state.season.endDate}T23:59:59`);
+        const now = new Date();
+        const days = Math.ceil((end - now) / 86400000);
+        if (days > 0) return `${days} gün kaldı`;
+        if (days === 0) return "Bugün bitiyor";
+        return "Lig tamamlandı";
+      }
+
+      function renderSeason() {
+        elements.seasonPanel.innerHTML = `
+          <div>
+            <div class="season-label">Sezon Takvimi</div>
+            <div class="season-value">${seasonStatus()}</div>
+          </div>
+          <div>
+            <div class="season-label">Başlangıç</div>
+            <div class="season-value">${dateLabel(state.season.startDate)}</div>
+          </div>
+          <div>
+            <div class="season-label">Bitiş</div>
+            <div class="season-value">${dateLabel(state.season.endDate)}</div>
+          </div>
+          <div>
+            <div class="season-label">Kalan Süre</div>
+            <div class="season-value">${remainingText()}</div>
+          </div>
+          ${state.isAdmin ? `<button class="button" data-action="edit-season">Takvimi Düzenle</button>` : ""}
+        `;
+      }
+
+      function topStats(key) {
+        return [...(state.stats[key] || [])].sort((a, b) => Number(b.value) - Number(a.value)).slice(0, 3);
+      }
+
+      function summaryRows(rows, valueKey = "points", labelKey = "team") {
+        return rows
+          .map(
+            (row, index) => `
+              <div class="summary-item">
+                <span>${index + 1}. ${escapeHtml(row[labelKey] || row.team || row.player)}</span>
+                <strong>${Number(row[valueKey]) || 0}</strong>
+              </div>
+            `
+          )
+          .join("");
+      }
+
+      function renderChampionAndSummary() {
+        const isEnded = seasonStatus() === "Bitti";
+        if (!isEnded) {
+          elements.championPanel.innerHTML = "";
+          elements.seasonSummary.innerHTML = "";
+          return;
+        }
+
+        const topTeams = sortTeams(state.teams).slice(0, 3);
+        const champion = topTeams[0];
+        elements.championPanel.innerHTML = champion
+          ? `
+            <div class="champion-panel">
+              <div class="champion-content">
+                <div class="champion-cup">1</div>
+                <div>
+                  <h3>${escapeHtml(champion.team)} Şampiyon Oldu!</h3>
+                  <p>Şampuanlar Ligi sezonu tamamlandı. Puan durumu lideri konfetiyle sahnede.</p>
+                </div>
+              </div>
+            </div>
+          `
+          : "";
+
+        elements.seasonSummary.innerHTML = `
+          <div class="summary-panel">
+            <div class="section-head">
+              <div>
+                <h3>Biten Lig Özeti</h3>
+                <p>Yeni lig başlamadan önce son sezonun en iyileri</p>
+              </div>
+            </div>
+            <div class="summary-grid">
+              <div class="summary-card">
+                <h4>Puan Durumu İlk 3</h4>
+                <div class="summary-list">${summaryRows(topTeams, "points")}</div>
+              </div>
+              <div class="summary-card">
+                <h4>Gol Krallığı İlk 3</h4>
+                <div class="summary-list">${summaryRows(topStats("goals"), "value", "player")}</div>
+              </div>
+              <div class="summary-card">
+                <h4>Asist Krallığı İlk 3</h4>
+                <div class="summary-list">${summaryRows(topStats("assists"), "value", "player")}</div>
+              </div>
+            </div>
+          </div>
+        `;
       }
 
       function renderStandings() {
@@ -1180,7 +1471,12 @@
                   <div class="score">${escapeHtml(match.score || "VS")}</div>
                   ${
                     state.isAdmin
-                      ? `<div class="score-actions"><button class="button small" data-action="update-score" data-index="${index}">Skor Güncelle</button></div>`
+                      ? `
+                        <div class="score-actions">
+                          <button class="button small" data-action="update-score" data-index="${index}">Skor Güncelle</button>
+                          <button class="button small ghost-danger" data-action="delete-match" data-index="${index}">Sil</button>
+                        </div>
+                      `
                       : ""
                   }
                 </div>
@@ -1312,8 +1608,8 @@
         const values = Object.fromEntries(formData.entries());
         elements.dialogForm.classList.add("saving");
         try {
-          if (activeSubmit) await activeSubmit(values);
-          elements.dialog.close();
+          const result = activeSubmit ? await activeSubmit(values) : undefined;
+          if (result !== false) elements.dialog.close();
         } finally {
           elements.dialogForm.classList.remove("saving");
         }
@@ -1384,7 +1680,7 @@
         );
       });
 
-      document.addEventListener("click", (event) => {
+      document.addEventListener("click", async (event) => {
         const button = event.target.closest("[data-action]");
         if (!button || !state.isAdmin) return;
 
@@ -1429,6 +1725,24 @@
           );
         }
 
+        if (action === "edit-season") {
+          openEditor(
+            "Sezon Takvimi",
+            [
+              { name: "startDate", label: "Lig başlangıç tarihi", type: "date", value: state.season.startDate, required: true },
+              { name: "endDate", label: "Lig bitiş tarihi", type: "date", value: state.season.endDate, required: true }
+            ],
+            async ({ startDate, endDate }) => {
+              if (endDate < startDate) {
+                showToast("Bitiş tarihi başlangıçtan önce olamaz.");
+                return false;
+              }
+              state.season = { startDate, endDate };
+              await commitChanges("Sezon takvimi güncellendi.");
+            }
+          );
+        }
+
         if (action === "update-score") {
           const match = state.matches[index];
           openEditor(
@@ -1439,6 +1753,14 @@
               await commitChanges("Skor güncellendi.");
             }
           );
+        }
+
+        if (action === "delete-match") {
+          const match = state.matches[index];
+          const ok = confirm(`${match.home} - ${match.away} fikstürü silinsin mi?`);
+          if (!ok) return;
+          state.matches.splice(index, 1);
+          await commitChanges("Fikstür silindi.");
         }
 
         if (action === "add-stat") {

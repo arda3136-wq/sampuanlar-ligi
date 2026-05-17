@@ -6,16 +6,16 @@
     <title>Şampuanlar Ligi</title>
     <style>
       :root {
-        --bg: #07111f;
-        --panel: rgba(255, 255, 255, 0.055);
-        --panel-strong: #101a2e;
-        --line: rgba(255, 255, 255, 0.11);
-        --muted: rgba(255, 255, 255, 0.62);
-        --soft: rgba(255, 255, 255, 0.08);
-        --green: #27e673;
-        --green-dark: #0fb85a;
-        --yellow: #f8d348;
-        --red: #ff5656;
+        --bg: #0b0d12;
+        --panel: rgba(255, 255, 255, 0.065);
+        --panel-strong: #171018;
+        --line: rgba(255, 255, 255, 0.13);
+        --muted: rgba(255, 255, 255, 0.66);
+        --soft: rgba(255, 255, 255, 0.09);
+        --green: #f4c95d;
+        --green-dark: #c98a1d;
+        --yellow: #f4c95d;
+        --red: #e23b4a;
         --text: #ffffff;
         --black: #07110d;
       }
@@ -28,9 +28,10 @@
         margin: 0;
         min-height: 100vh;
         background:
-          radial-gradient(circle at 18% 8%, rgba(39, 230, 115, 0.16), transparent 28rem),
-          radial-gradient(circle at 92% 4%, rgba(248, 211, 72, 0.12), transparent 24rem),
-          linear-gradient(180deg, #07111f 0%, #09131f 54%, #050910 100%);
+          radial-gradient(circle at 14% 8%, rgba(226, 59, 74, 0.22), transparent 30rem),
+          radial-gradient(circle at 88% 2%, rgba(244, 201, 93, 0.16), transparent 26rem),
+          radial-gradient(circle at 50% 86%, rgba(109, 40, 217, 0.1), transparent 34rem),
+          linear-gradient(180deg, #0b0d12 0%, #151018 48%, #08090e 100%);
         color: var(--text);
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
@@ -76,6 +77,13 @@
         padding: 16px 0;
       }
 
+      .header-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
       .brand {
         display: flex;
         align-items: center;
@@ -94,7 +102,7 @@
         color: var(--black);
         font-size: 20px;
         font-weight: 1000;
-        box-shadow: 0 16px 42px rgba(39, 230, 115, 0.22);
+        box-shadow: 0 16px 42px rgba(244, 201, 93, 0.22);
       }
 
       h1,
@@ -135,8 +143,8 @@
 
       .button:hover {
         transform: translateY(-1px);
-        background: #42f086;
-        box-shadow: 0 14px 34px rgba(39, 230, 115, 0.22);
+        background: #ffd978;
+        box-shadow: 0 14px 34px rgba(244, 201, 93, 0.22);
       }
 
       .button.secondary {
@@ -265,7 +273,7 @@
         margin-bottom: 22px;
         background:
           radial-gradient(circle at 20% 15%, rgba(248, 211, 72, 0.28), transparent 18rem),
-          linear-gradient(135deg, rgba(39, 230, 115, 0.22), rgba(255, 255, 255, 0.06));
+          linear-gradient(135deg, rgba(244, 201, 93, 0.22), rgba(226, 59, 74, 0.12));
       }
 
       .champion-panel::before,
@@ -393,7 +401,7 @@
         border-radius: 18px;
         background:
           linear-gradient(135deg, rgba(16, 26, 46, 0.96), rgba(9, 16, 30, 0.96)),
-          linear-gradient(90deg, rgba(39, 230, 115, 0.08), transparent);
+          linear-gradient(90deg, rgba(244, 201, 93, 0.12), transparent);
         padding: clamp(18px, 4vw, 34px);
       }
 
@@ -407,15 +415,17 @@
 
       .team-badge {
         display: grid;
-        width: clamp(58px, 10vw, 82px);
-        height: clamp(58px, 10vw, 82px);
+        width: clamp(74px, 12vw, 104px);
+        height: clamp(74px, 12vw, 104px);
         place-items: center;
         margin: 0 auto 12px;
         border-radius: 50%;
         background: linear-gradient(135deg, var(--yellow), #ff8d30);
         color: #111;
         font-weight: 1000;
-        font-size: 22px;
+        font-size: 26px;
+        border: 3px solid rgba(255, 255, 255, 0.24);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
       }
 
       .team-badge.alt {
@@ -513,15 +523,16 @@
 
       .club-logo {
         display: grid;
-        width: 38px;
-        height: 38px;
-        flex: 0 0 38px;
+        width: 48px;
+        height: 48px;
+        flex: 0 0 48px;
         place-items: center;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.1);
         color: var(--green);
         font-weight: 1000;
         overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.18);
       }
 
       .club-logo img,
@@ -586,14 +597,16 @@
 
       .mini-logo {
         display: grid;
-        width: 58px;
-        height: 58px;
+        width: 74px;
+        height: 74px;
         place-items: center;
         margin: 0 auto 10px;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.1);
         color: var(--green);
         font-weight: 1000;
+        border: 2px solid rgba(255, 255, 255, 0.18);
+        overflow: hidden;
       }
 
       .score {
@@ -614,10 +627,76 @@
 
       .transfer-grid,
       .stats-grid,
+      .news-grid,
       .admin-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 18px;
+      }
+
+      .team-owner-panel,
+      .news-card {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--panel);
+        padding: 22px;
+      }
+
+      .team-owner-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .team-owner-stat {
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.07);
+        padding: 16px;
+      }
+
+      .team-owner-stat span {
+        display: block;
+        color: rgba(255, 255, 255, 0.54);
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .team-owner-stat strong {
+        display: block;
+        margin-top: 6px;
+        color: var(--green);
+        font-size: 26px;
+        font-weight: 1000;
+      }
+
+      .news-card {
+        overflow: hidden;
+        padding: 0;
+      }
+
+      .news-image {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: rgba(255, 255, 255, 0.08);
+        object-fit: cover;
+      }
+
+      .news-body {
+        padding: 18px;
+      }
+
+      .news-body h4 {
+        color: white;
+        font-size: 21px;
+        font-weight: 1000;
+        margin-bottom: 8px;
+      }
+
+      .news-body p {
+        color: rgba(255, 255, 255, 0.66);
+        line-height: 1.5;
       }
 
       .stats-grid {
@@ -676,10 +755,10 @@
       .admin-panel {
         margin-bottom: 52px;
         border-radius: 18px;
-        background: linear-gradient(135deg, #32e875, #0ea55c);
+        background: linear-gradient(135deg, #f4c95d, #e23b4a);
         color: var(--black);
         padding: clamp(24px, 5vw, 42px);
-        box-shadow: 0 24px 80px rgba(39, 230, 115, 0.18);
+        box-shadow: 0 24px 80px rgba(226, 59, 74, 0.18);
       }
 
       .admin-panel h3 {
@@ -758,7 +837,7 @@
 
       input:focus {
         border-color: var(--green);
-        box-shadow: 0 0 0 3px rgba(39, 230, 115, 0.14);
+        box-shadow: 0 0 0 3px rgba(244, 201, 93, 0.14);
       }
 
       .dialog-actions {
@@ -802,6 +881,8 @@
         .match-grid,
         .transfer-grid,
         .stats-grid,
+        .news-grid,
+        .team-owner-grid,
         .season-panel,
         .summary-grid,
         .admin-grid {
@@ -862,7 +943,10 @@
               <p class="subtitle">Profesyonel Lig Sistemi</p>
             </div>
           </div>
-          <button id="adminButton" class="button">Admin Girişi</button>
+          <div class="header-actions">
+            <button id="teamLoginButton" class="button secondary">Takım Girişi</button>
+            <button id="adminButton" class="button">Admin Girişi</button>
+          </div>
         </div>
       </header>
 
@@ -884,24 +968,9 @@
             <div class="match-highlight">
               <div class="card-title-row">
                 <h3>Canlı Maç</h3>
-                <span class="status">YAKINDA</span>
+                <span id="liveMatchStatus" class="status">YAKINDA</span>
               </div>
-              <div class="scoreboard">
-                <div class="score-row">
-                  <div>
-                    <div class="team-badge">AJX</div>
-                    <p><strong>AJAX</strong></p>
-                  </div>
-                  <div class="versus">
-                    <small>Yeni Sezon</small>
-                    <strong>VS</strong>
-                  </div>
-                  <div>
-                    <div class="team-badge alt">GS</div>
-                    <p><strong>GALATASARAT</strong></p>
-                  </div>
-                </div>
-              </div>
+              <div id="liveMatchBoard" class="scoreboard"></div>
             </div>
           </div>
         </section>
@@ -909,6 +978,25 @@
         <section class="section">
           <div class="container">
             <div id="seasonPanel" class="season-panel"></div>
+          </div>
+        </section>
+
+        <section id="teamOwnerSection" class="section" style="display: none;">
+          <div class="container">
+            <div id="teamOwnerPanel" class="team-owner-panel"></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-head">
+              <div>
+                <h3>Haberler</h3>
+                <p>Kısa ve fotoğraflı lig haberleri</p>
+              </div>
+              <button id="addNewsButton" class="button">Haber Ekle</button>
+            </div>
+            <div id="newsGrid" class="news-grid"></div>
           </div>
         </section>
 
@@ -1023,21 +1111,23 @@
 
     <script>
       const defaultTeams = [
-        { team: "AJAX", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("AJX", "#ffffff", "#d71920") },
-        { team: "GALATASARAT", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("GS", "#f6c344", "#b21f2d") },
+        { team: "AC MİLAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("ACM", "#151515", "#e23b4a") },
+        { team: "GALATASARAY", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("GS", "#f4c95d", "#b21f2d") },
         { team: "ARSENAL", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("ARS", "#ef233c", "#f6f6f6") },
         { team: "FENERBAHÇE", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("FB", "#ffe033", "#123c8c") },
         { team: "İNTER NAZİONALE MİLAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("INT", "#1d4ed8", "#0f172a") }
       ];
 
       const defaultMatches = [
-        { home: "AJAX", away: "GALATASARAT", score: "VS", stadium: "League Arena", time: "20:00" },
+        { home: "AC MİLAN", away: "GALATASARAY", score: "VS", stadium: "League Arena", time: "20:00" },
         { home: "ARSENAL", away: "FENERBAHÇE", score: "VS", stadium: "Champions Stadium", time: "18:30" }
       ];
 
+      const defaultNews = [];
+
       const defaultStats = {
         goals: [
-          { player: "Mauro Icardi", team: "GALATASARAT", value: 0 },
+          { player: "Mauro Icardi", team: "GALATASARAY", value: 0 },
           { player: "Bukayo Saka", team: "ARSENAL", value: 0 }
         ],
         assists: [
@@ -1045,12 +1135,12 @@
           { player: "Martin Odegaard", team: "ARSENAL", value: 0 }
         ],
         redCards: [
-          { player: "Oyuncu 1", team: "AJAX", value: 0 },
+          { player: "Oyuncu 1", team: "AC MİLAN", value: 0 },
           { player: "Oyuncu 2", team: "İNTER NAZİONALE MİLAN", value: 0 }
         ],
         yellowCards: [
           { player: "Oyuncu 3", team: "FENERBAHÇE", value: 0 },
-          { player: "Oyuncu 4", team: "GALATASARAT", value: 0 }
+          { player: "Oyuncu 4", team: "GALATASARAY", value: 0 }
         ]
       };
 
@@ -1062,16 +1152,26 @@
       const state = {
         teams: load("league_teams", defaultTeams),
         matches: load("league_matches", defaultMatches),
+        liveMatchIndex: 0,
+        news: load("league_news", defaultNews),
         stats: load("league_stats", defaultStats),
         transfers: load("league_transfers", []),
         season: load("league_season", defaultSeason),
+        teamOwner: sessionStorage.getItem("league_team_owner") || "",
         isAdmin: Boolean(sessionStorage.getItem("league_admin_token"))
       };
 
       const elements = {
         adminButton: document.getElementById("adminButton"),
+        teamLoginButton: document.getElementById("teamLoginButton"),
         addMatchButton: document.getElementById("addMatchButton"),
         addTransferButton: document.getElementById("addTransferButton"),
+        addNewsButton: document.getElementById("addNewsButton"),
+        liveMatchBoard: document.getElementById("liveMatchBoard"),
+        liveMatchStatus: document.getElementById("liveMatchStatus"),
+        teamOwnerSection: document.getElementById("teamOwnerSection"),
+        teamOwnerPanel: document.getElementById("teamOwnerPanel"),
+        newsGrid: document.getElementById("newsGrid"),
         seasonPanel: document.getElementById("seasonPanel"),
         championPanel: document.getElementById("championPanel"),
         seasonSummary: document.getElementById("seasonSummary"),
@@ -1106,6 +1206,8 @@
         return {
           teams: state.teams,
           matches: state.matches,
+          liveMatchIndex: state.liveMatchIndex,
+          news: state.news,
           stats: state.stats,
           transfers: state.transfers,
           season: state.season
@@ -1130,6 +1232,8 @@
           const data = await requestJson("/api/state");
           state.teams = data.teams || state.teams;
           state.matches = data.matches || state.matches;
+          state.liveMatchIndex = Number.isInteger(data.liveMatchIndex) ? data.liveMatchIndex : state.liveMatchIndex;
+          state.news = data.news || state.news;
           state.stats = { ...defaultStats, ...(data.stats || {}) };
           state.transfers = data.transfers || state.transfers;
           state.season = { ...defaultSeason, ...(data.season || {}) };
@@ -1147,6 +1251,8 @@
         });
         state.teams = data.teams || state.teams;
         state.matches = data.matches || state.matches;
+        state.liveMatchIndex = Number.isInteger(data.liveMatchIndex) ? data.liveMatchIndex : state.liveMatchIndex;
+        state.news = data.news || state.news;
         state.stats = { ...defaultStats, ...(data.stats || state.stats) };
         state.transfers = data.transfers || state.transfers;
         state.season = { ...defaultSeason, ...(data.season || state.season) };
@@ -1245,12 +1351,15 @@
         if (stillOldDefault) {
           state.teams = defaultTeams;
           state.matches = defaultMatches;
+          state.liveMatchIndex = 0;
           state.stats = defaultStats;
           save("league_teams", state.teams);
           save("league_matches", state.matches);
           save("league_stats", state.stats);
         }
         state.teams = state.teams.map(normalizeTeam);
+        state.news = Array.isArray(state.news) ? state.news : defaultNews;
+        state.liveMatchIndex = Number.isInteger(state.liveMatchIndex) ? state.liveMatchIndex : 0;
         save("league_teams", state.teams);
         state.stats = { ...defaultStats, ...state.stats };
         state.season = { ...defaultSeason, ...state.season };
@@ -1276,9 +1385,42 @@
         });
       }
 
+      function renameLegacyTeams() {
+        const renameMap = {
+          AJAX: "AC MİLAN",
+          GALATASARAT: "GALATASARAY"
+        };
+        let changed = false;
+        Object.entries(renameMap).forEach(([oldName, newName]) => {
+          const teamIndex = state.teams.findIndex((team) => team.team === oldName);
+          if (teamIndex !== -1) {
+            const defaultTeam = defaultTeams.find((team) => team.team === newName);
+            state.teams[teamIndex] = {
+              ...state.teams[teamIndex],
+              team: newName,
+              logo: state.teams[teamIndex].logo || defaultTeam?.logo || ""
+            };
+            updateTeamReferences(oldName, newName);
+            changed = true;
+          }
+          if (state.teamOwner === oldName) {
+            state.teamOwner = newName;
+            sessionStorage.setItem("league_team_owner", newName);
+          }
+        });
+        if (!state.teams.some((team) => team.team === "AC MİLAN")) {
+          state.teams.unshift(defaultTeams[0]);
+          changed = true;
+        }
+        if (changed && state.isAdmin) commitChanges("Takım isimleri güncellendi.");
+      }
+
       function render() {
         renderAdminState();
+        renderLiveMatch();
         renderSeason();
+        renderTeamOwner();
+        renderNews();
         renderStandings();
         renderChampionAndSummary();
         renderMatches();
@@ -1289,8 +1431,90 @@
       function renderAdminState() {
         elements.adminButton.textContent = state.isAdmin ? "Admin Çıkış" : "Admin Girişi";
         elements.adminButton.className = state.isAdmin ? "button danger" : "button";
+        elements.teamLoginButton.textContent = state.teamOwner ? `${state.teamOwner} Çıkış` : "Takım Girişi";
+        elements.teamLoginButton.className = state.teamOwner ? "button danger" : "button secondary";
         elements.addMatchButton.style.display = state.isAdmin ? "inline-flex" : "none";
         elements.addTransferButton.style.display = state.isAdmin ? "inline-flex" : "none";
+        elements.addNewsButton.style.display = state.isAdmin ? "inline-flex" : "none";
+      }
+
+      function renderLiveMatch() {
+        const match = state.matches[state.liveMatchIndex] || state.matches[0];
+        if (!match) {
+          elements.liveMatchStatus.textContent = "YOK";
+          elements.liveMatchBoard.innerHTML = `<div class="empty">Canlı maç seçilmedi.</div>`;
+          return;
+        }
+        elements.liveMatchStatus.textContent = match.score && match.score !== "VS" ? "CANLI" : "YAKINDA";
+        elements.liveMatchBoard.innerHTML = `
+          <div class="score-row">
+            <div>
+              ${logoMarkup(match.home, "team-badge")}
+              <p><strong>${escapeHtml(match.home)}</strong></p>
+            </div>
+            <div class="versus">
+              <small>${escapeHtml(match.stadium || "Stadyum")} · ${escapeHtml(match.time || "Saat")}</small>
+              <strong>${escapeHtml(match.score || "VS")}</strong>
+            </div>
+            <div>
+              ${logoMarkup(match.away, "team-badge alt")}
+              <p><strong>${escapeHtml(match.away)}</strong></p>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderTeamOwner() {
+        const team = getTeamByName(state.teamOwner);
+        if (!team) {
+          elements.teamOwnerSection.style.display = "none";
+          elements.teamOwnerPanel.innerHTML = "";
+          return;
+        }
+        const teamMatches = state.matches.filter((match) => match.home === team.team || match.away === team.team);
+        const teamTransfers = state.transfers.filter((transfer) => transfer.from === team.team || transfer.to === team.team);
+        elements.teamOwnerSection.style.display = "block";
+        elements.teamOwnerPanel.innerHTML = `
+          <div class="section-head">
+            <div>
+              <h3>${escapeHtml(team.team)} Takım Paneli</h3>
+              <p>Admin yetkisi olmadan takımına ait bilgileri hızlıca görürsün.</p>
+            </div>
+          </div>
+          <div class="team-owner-grid">
+            <div class="team-owner-stat"><span>Puan</span><strong>${Number(team.points) || 0}</strong></div>
+            <div class="team-owner-stat"><span>Oynanan</span><strong>${Number(team.played) || 0}</strong></div>
+            <div class="team-owner-stat"><span>Averaj</span><strong>${goalDifference(team)}</strong></div>
+            <div class="team-owner-stat"><span>Form</span><strong>${escapeHtml(team.form || "-----")}</strong></div>
+          </div>
+          <div class="team-owner-grid" style="margin-top: 18px;">
+            <div class="team-owner-stat"><span>Fikstür</span><strong>${teamMatches.length}</strong></div>
+            <div class="team-owner-stat"><span>Transfer</span><strong>${teamTransfers.length}</strong></div>
+            <div class="team-owner-stat"><span>AG</span><strong>${Number(team.goalsFor) || 0}</strong></div>
+            <div class="team-owner-stat"><span>YG</span><strong>${Number(team.goalsAgainst) || 0}</strong></div>
+          </div>
+        `;
+      }
+
+      function renderNews() {
+        if (!state.news.length) {
+          elements.newsGrid.innerHTML = `<div class="empty">Henüz haber eklenmedi.</div>`;
+          return;
+        }
+        elements.newsGrid.innerHTML = state.news
+          .map(
+            (item, index) => `
+              <article class="news-card">
+                ${item.image ? `<img class="news-image" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title || "Haber")}">` : `<div class="news-image"></div>`}
+                <div class="news-body">
+                  <h4>${escapeHtml(item.title || "Haber")}</h4>
+                  <p>${escapeHtml(item.text || "")}</p>
+                  ${state.isAdmin ? `<div class="score-actions"><button class="button small ghost-danger" data-action="delete-news" data-index="${index}">Sil</button></div>` : ""}
+                </div>
+              </article>
+            `
+          )
+          .join("");
       }
 
       function todayKey() {
@@ -1474,6 +1698,7 @@
                       ? `
                         <div class="score-actions">
                           <button class="button small" data-action="update-score" data-index="${index}">Skor Güncelle</button>
+                          <button class="button small secondary" data-action="set-live-match" data-index="${index}">Canlı Maç Yap</button>
                           <button class="button small ghost-danger" data-action="delete-match" data-index="${index}">Sil</button>
                         </div>
                       `
@@ -1649,6 +1874,39 @@
         );
       });
 
+      elements.teamLoginButton.addEventListener("click", () => {
+        if (state.teamOwner) {
+          state.teamOwner = "";
+          sessionStorage.removeItem("league_team_owner");
+          showToast("Takım çıkışı yapıldı.");
+          render();
+          return;
+        }
+
+        openEditor(
+          "Takım Girişi",
+          [
+            { name: "team", label: "Takım adı", value: state.teams[0]?.team || "", required: true },
+            { name: "code", label: "Takım giriş kodu", type: "password", required: true }
+          ],
+          async ({ team, code }) => {
+            try {
+              const data = await requestJson("/api/team-login", {
+                method: "POST",
+                body: JSON.stringify({ team: team.trim(), code })
+              });
+              state.teamOwner = data.team;
+              sessionStorage.setItem("league_team_owner", data.team);
+              showToast(`${data.team} takım paneli açıldı.`);
+              render();
+            } catch (error) {
+              showToast(error.message || "Takım girişi başarısız.");
+              return false;
+            }
+          }
+        );
+      });
+
       elements.addMatchButton.addEventListener("click", () => {
         openEditor(
           "Maç Oluştur",
@@ -1676,6 +1934,26 @@
           async (values) => {
             state.transfers.unshift(values);
             await commitChanges("Transfer eklendi.");
+          }
+        );
+      });
+
+      elements.addNewsButton.addEventListener("click", () => {
+        openEditor(
+          "Haber Ekle",
+          [
+            { name: "title", label: "Haber başlığı", required: true },
+            { name: "text", label: "Kısa haber metni", required: true },
+            { name: "image", label: "Fotoğraf adresi", required: true }
+          ],
+          async ({ title, text, image }) => {
+            state.news.unshift({
+              title: title.trim(),
+              text: text.trim(),
+              image: image.trim(),
+              createdAt: new Date().toISOString()
+            });
+            await commitChanges("Haber eklendi.");
           }
         );
       });
@@ -1760,7 +2038,20 @@
           const ok = confirm(`${match.home} - ${match.away} fikstürü silinsin mi?`);
           if (!ok) return;
           state.matches.splice(index, 1);
+          if (state.liveMatchIndex >= state.matches.length) state.liveMatchIndex = 0;
           await commitChanges("Fikstür silindi.");
+        }
+
+        if (action === "set-live-match") {
+          state.liveMatchIndex = index;
+          await commitChanges("Canlı maç güncellendi.");
+        }
+
+        if (action === "delete-news") {
+          const ok = confirm("Bu haber silinsin mi?");
+          if (!ok) return;
+          state.news.splice(index, 1);
+          await commitChanges("Haber silindi.");
         }
 
         if (action === "add-stat") {
@@ -1804,6 +2095,7 @@
       async function initialize() {
         await loadServerState();
         applyRequestedDefaults();
+        renameLegacyTeams();
         render();
       }
 

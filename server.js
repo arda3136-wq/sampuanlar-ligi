@@ -125,6 +125,23 @@ const server = http.createServer(async (request, response) => {
       return json(response, 200, await readState());
     }
 
+    if (request.method === "GET" && url.pathname === "/api/health") {
+      let dataFileExists = false;
+      try {
+        await fs.access(DATA_FILE);
+        dataFileExists = true;
+      } catch {
+        dataFileExists = false;
+      }
+      return json(response, 200, {
+        ok: true,
+        dataDir: DATA_DIR,
+        dataFileExists,
+        hasAdminUser: Boolean(ADMIN_USER),
+        hasAdminPass: Boolean(ADMIN_PASS)
+      });
+    }
+
     if (request.method === "POST" && url.pathname === "/api/login") {
       if (!ADMIN_USER || !ADMIN_PASS) {
         return json(response, 500, { message: "Admin bilgileri sunucuda ayarlanmamış." });

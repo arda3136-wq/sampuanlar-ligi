@@ -1104,8 +1104,12 @@
               <div id="posterControls" class="poster-controls">
                 <div class="poster-form">
                   <div class="field">
-                    <label for="posterMatch">Maç</label>
-                    <select id="posterMatch"></select>
+                    <label for="posterHome">Ev sahibi takım</label>
+                    <select id="posterHome"></select>
+                  </div>
+                  <div class="field">
+                    <label for="posterAway">Deplasman takımı</label>
+                    <select id="posterAway"></select>
                   </div>
                   <div class="field">
                     <label for="posterDate">Tarih</label>
@@ -1238,6 +1242,8 @@
 
       const defaultFixturePoster = {
         matchIndex: 0,
+        home: "AC MİLAN",
+        away: "GALATASARAY",
         date: "",
         time: "",
         stadium: "",
@@ -1269,7 +1275,8 @@
         teamOwnerPanel: document.getElementById("teamOwnerPanel"),
         newsGrid: document.getElementById("newsGrid"),
         posterControls: document.getElementById("posterControls"),
-        posterMatch: document.getElementById("posterMatch"),
+        posterHome: document.getElementById("posterHome"),
+        posterAway: document.getElementById("posterAway"),
         posterDate: document.getElementById("posterDate"),
         posterTime: document.getElementById("posterTime"),
         posterStadium: document.getElementById("posterStadium"),
@@ -1294,6 +1301,9 @@
 
       let activeSubmit = null;
       let toastTimer = null;
+      const fixtureBackground = new Image();
+      fixtureBackground.src = "/assets/fixture-background.png";
+      fixtureBackground.onload = () => drawFixturePoster();
 
       function load(key, fallback) {
         return structuredClone(fallback);
@@ -1628,24 +1638,34 @@
       }
 
       function renderFixturePosterTool() {
-        elements.posterControls.style.display = state.isAdmin ? "block" : "none";
-        elements.posterMatch.innerHTML = state.matches
-          .map((match, index) => `<option value="${index}">${escapeHtml(match.home)} - ${escapeHtml(match.away)}</option>`)
+        elements.savePosterButton.style.display = state.isAdmin ? "inline-flex" : "none";
+        const teamOptions = state.teams
+          .map((team) => `<option value="${escapeHtml(team.team)}">${escapeHtml(team.team)}</option>`)
           .join("");
+        elements.posterHome.innerHTML = teamOptions;
+        elements.posterAway.innerHTML = teamOptions;
         const poster = currentPoster();
-        elements.posterMatch.value = String(poster.matchIndex);
+        elements.posterHome.value = poster.home;
+        elements.posterAway.value = poster.away;
         elements.posterDate.value = poster.date;
         elements.posterTime.value = poster.time;
         elements.posterStadium.value = poster.stadium;
         elements.posterNote.value = poster.note;
+        [elements.posterHome, elements.posterAway, elements.posterDate, elements.posterTime, elements.posterStadium, elements.posterNote].forEach((field) => {
+          field.disabled = !state.isAdmin;
+        });
         drawFixturePoster();
       }
 
       function currentPoster() {
         const matchIndex = Number.isInteger(state.fixturePoster.matchIndex) ? state.fixturePoster.matchIndex : 0;
         const match = state.matches[matchIndex] || state.matches[0] || {};
+        const home = state.fixturePoster.home || match.home || state.teams[0]?.team || "EV SAHİBİ";
+        const away = state.fixturePoster.away || match.away || state.teams[1]?.team || "DEPLASMAN";
         return {
           matchIndex: state.matches[matchIndex] ? matchIndex : 0,
+          home,
+          away,
           date: state.fixturePoster.date || dateLabel(state.season.startDate).toUpperCase(),
           time: state.fixturePoster.time || match.time || "20:00",
           stadium: state.fixturePoster.stadium || match.stadium || "STADYUM",
@@ -1708,70 +1728,34 @@
         const canvas = elements.fixturePosterCanvas;
         const ctx = canvas.getContext("2d");
         const poster = currentPoster();
-        const match = state.matches[poster.matchIndex] || state.matches[0] || { home: "EV SAHİBİ", away: "DEPLASMAN", score: "VS" };
 
-        const bg = ctx.createLinearGradient(0, 0, 1080, 1080);
-        bg.addColorStop(0, "#090a0f");
-        bg.addColorStop(0.42, "#1b0e17");
-        bg.addColorStop(1, "#090a0f");
-        ctx.fillStyle = bg;
-        ctx.fillRect(0, 0, 1080, 1080);
-
-        const glowRed = ctx.createRadialGradient(160, 120, 0, 160, 120, 440);
-        glowRed.addColorStop(0, "rgba(226,59,74,0.42)");
-        glowRed.addColorStop(1, "rgba(226,59,74,0)");
-        ctx.fillStyle = glowRed;
-        ctx.fillRect(0, 0, 1080, 1080);
-
-        const glowGold = ctx.createRadialGradient(930, 140, 0, 930, 140, 360);
-        glowGold.addColorStop(0, "rgba(244,201,93,0.34)");
-        glowGold.addColorStop(1, "rgba(244,201,93,0)");
-        ctx.fillStyle = glowGold;
-        ctx.fillRect(0, 0, 1080, 1080);
-
-        ctx.strokeStyle = "rgba(255,255,255,0.08)";
-        ctx.lineWidth = 2;
-        for (let i = 0; i < 9; i += 1) {
-          ctx.beginPath();
-          ctx.moveTo(0, 190 + i * 70);
-          ctx.lineTo(1080, 120 + i * 70);
-          ctx.stroke();
+        if (fixtureBackground.complete && fixtureBackground.naturalWidth) {
+          ctx.drawImage(fixtureBackground, 0, 0, 1080, 1080);
+        } else {
+          const bg = ctx.createLinearGradient(0, 0, 1080, 1080);
+          bg.addColorStop(0, "#090a0f");
+          bg.addColorStop(0.42, "#1b0e17");
+          bg.addColorStop(1, "#090a0f");
+          ctx.fillStyle = bg;
+          ctx.fillRect(0, 0, 1080, 1080);
         }
 
-        ctx.fillStyle = "rgba(255,255,255,0.08)";
-        roundRect(ctx, 76, 74, 928, 86, 28);
+        drawRoundLogo(ctx, poster.home, 260, 430, 98);
+        drawRoundLogo(ctx, poster.away, 820, 430, 98);
+        drawCenteredText(ctx, poster.home, 260, 625, 340, 38, "#ffffff");
+        drawCenteredText(ctx, poster.away, 820, 625, 340, 38, "#ffffff");
+
+        ctx.fillStyle = "rgba(0,0,0,0.28)";
+        roundRect(ctx, 420, 360, 240, 120, 32);
         ctx.fill();
-        drawCenteredText(ctx, "ŞAMPUANLAR LİGİ", 540, 118, 780, 48, "#f4c95d");
-        drawCenteredText(ctx, poster.note.toUpperCase(), 540, 204, 680, 30, "rgba(255,255,255,0.78)");
+        drawCenteredText(ctx, "VS", 540, 420, 190, 74, "#f4c95d");
 
-        drawRoundLogo(ctx, match.home, 255, 420, 118);
-        drawRoundLogo(ctx, match.away, 825, 420, 118);
-        drawCenteredText(ctx, match.home, 255, 620, 350, 42, "#ffffff");
-        drawCenteredText(ctx, match.away, 825, 620, 350, 42, "#ffffff");
-
-        ctx.fillStyle = "rgba(255,255,255,0.1)";
-        roundRect(ctx, 438, 342, 204, 150, 34);
+        ctx.fillStyle = "rgba(0,0,0,0.42)";
+        roundRect(ctx, 116, 760, 848, 156, 34);
         ctx.fill();
-        drawCenteredText(ctx, match.score || "VS", 540, 416, 180, 72, "#f4c95d");
-
-        ctx.fillStyle = "rgba(0,0,0,0.34)";
-        roundRect(ctx, 116, 752, 848, 176, 34);
-        ctx.fill();
-        ctx.strokeStyle = "rgba(244,201,93,0.35)";
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        drawCenteredText(ctx, poster.date.toUpperCase(), 300, 810, 280, 30, "#ffffff");
-        drawCenteredText(ctx, poster.time.toUpperCase(), 540, 810, 180, 34, "#f4c95d");
-        drawCenteredText(ctx, poster.stadium.toUpperCase(), 780, 810, 280, 30, "#ffffff");
-        drawCenteredText(ctx, "TARİH", 300, 875, 220, 22, "rgba(255,255,255,0.52)");
-        drawCenteredText(ctx, "SAAT", 540, 875, 160, 22, "rgba(255,255,255,0.52)");
-        drawCenteredText(ctx, "STADYUM", 780, 875, 220, 22, "rgba(255,255,255,0.52)");
-
-        ctx.fillStyle = "rgba(255,255,255,0.74)";
-        ctx.font = "800 24px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText("Paylaşım görseli", 540, 994);
+        drawCenteredText(ctx, poster.date.toUpperCase(), 300, 815, 270, 28, "#ffffff");
+        drawCenteredText(ctx, poster.time.toUpperCase(), 540, 815, 160, 34, "#f4c95d");
+        drawCenteredText(ctx, poster.stadium.toUpperCase(), 780, 815, 270, 28, "#ffffff");
       }
 
       function roundRect(ctx, x, y, width, height, radius) {
@@ -2228,7 +2212,11 @@
       elements.savePosterButton.addEventListener("click", async () => {
         if (!state.isAdmin) return;
         state.fixturePoster = {
-          matchIndex: Number(elements.posterMatch.value) || 0,
+          matchIndex: state.matches.findIndex(
+            (match) => match.home === elements.posterHome.value && match.away === elements.posterAway.value
+          ),
+          home: elements.posterHome.value,
+          away: elements.posterAway.value,
           date: elements.posterDate.value.trim(),
           time: elements.posterTime.value.trim(),
           stadium: elements.posterStadium.value.trim(),
@@ -2243,6 +2231,33 @@
         link.download = "sampuanlar-ligi-fikstur.png";
         link.href = elements.fixturePosterCanvas.toDataURL("image/png");
         link.click();
+      });
+
+      [elements.posterHome, elements.posterAway, elements.posterDate, elements.posterTime, elements.posterStadium, elements.posterNote].forEach((field) => {
+        field.addEventListener("input", () => {
+          state.fixturePoster = {
+            ...state.fixturePoster,
+            home: elements.posterHome.value,
+            away: elements.posterAway.value,
+            date: elements.posterDate.value.trim(),
+            time: elements.posterTime.value.trim(),
+            stadium: elements.posterStadium.value.trim(),
+            note: elements.posterNote.value.trim() || "Fikstür"
+          };
+          drawFixturePoster();
+        });
+        field.addEventListener("change", () => {
+          state.fixturePoster = {
+            ...state.fixturePoster,
+            home: elements.posterHome.value,
+            away: elements.posterAway.value,
+            date: elements.posterDate.value.trim(),
+            time: elements.posterTime.value.trim(),
+            stadium: elements.posterStadium.value.trim(),
+            note: elements.posterNote.value.trim() || "Fikstür"
+          };
+          drawFixturePoster();
+        });
       });
 
       document.addEventListener("click", async (event) => {

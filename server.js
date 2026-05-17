@@ -58,7 +58,8 @@ const defaultState = {
     date: "",
     time: "",
     stadium: "",
-    note: "Fikstür"
+    note: "Fikstür",
+    layout: "template"
   }
 };
 

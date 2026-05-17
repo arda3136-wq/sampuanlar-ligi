@@ -645,6 +645,11 @@
         transform: translateY(0);
       }
 
+      .saving .dialog-actions .button[type="submit"] {
+        opacity: 0.65;
+        pointer-events: none;
+      }
+
       @media (max-width: 820px) {
         .hero-grid,
         .match-grid,
@@ -1301,12 +1306,17 @@
         if (firstInput) firstInput.focus();
       }
 
-      elements.dialogForm.addEventListener("submit", (event) => {
+      elements.dialogForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         const formData = new FormData(elements.dialogForm);
         const values = Object.fromEntries(formData.entries());
-        if (activeSubmit) activeSubmit(values);
-        elements.dialog.close();
+        elements.dialogForm.classList.add("saving");
+        try {
+          if (activeSubmit) await activeSubmit(values);
+          elements.dialog.close();
+        } finally {
+          elements.dialogForm.classList.remove("saving");
+        }
       });
 
       elements.cancelDialog.addEventListener("click", () => elements.dialog.close());

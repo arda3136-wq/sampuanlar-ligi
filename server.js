@@ -55,6 +55,8 @@ const defaultState = {
     matchIndex: 0,
     home: "AC MİLAN",
     away: "GALATASARAY",
+    homeLogo: "",
+    awayLogo: "",
     date: "",
     time: "",
     stadium: "",

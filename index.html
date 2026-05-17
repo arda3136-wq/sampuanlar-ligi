@@ -1,4 +1,4 @@
-﻿<!doctype html>
+﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -1740,22 +1740,22 @@
           ctx.fillRect(0, 0, 1080, 1080);
         }
 
-        drawRoundLogo(ctx, poster.home, 260, 430, 98);
-        drawRoundLogo(ctx, poster.away, 820, 430, 98);
-        drawCenteredText(ctx, poster.home, 260, 625, 340, 38, "#ffffff");
-        drawCenteredText(ctx, poster.away, 820, 625, 340, 38, "#ffffff");
+        drawRoundLogo(ctx, poster.home, 250, 455, 90);
+        drawRoundLogo(ctx, poster.away, 830, 455, 90);
+        drawCenteredText(ctx, poster.home, 250, 626, 350, 34, "#ffffff");
+        drawCenteredText(ctx, poster.away, 830, 626, 350, 34, "#ffffff");
 
         ctx.fillStyle = "rgba(0,0,0,0.28)";
-        roundRect(ctx, 420, 360, 240, 120, 32);
+        roundRect(ctx, 432, 382, 216, 106, 30);
         ctx.fill();
-        drawCenteredText(ctx, "VS", 540, 420, 190, 74, "#f4c95d");
+        drawCenteredText(ctx, "VS", 540, 434, 180, 68, "#f4c95d");
 
         ctx.fillStyle = "rgba(0,0,0,0.42)";
-        roundRect(ctx, 116, 760, 848, 156, 34);
+        roundRect(ctx, 126, 772, 828, 136, 30);
         ctx.fill();
-        drawCenteredText(ctx, poster.date.toUpperCase(), 300, 815, 270, 28, "#ffffff");
-        drawCenteredText(ctx, poster.time.toUpperCase(), 540, 815, 160, 34, "#f4c95d");
-        drawCenteredText(ctx, poster.stadium.toUpperCase(), 780, 815, 270, 28, "#ffffff");
+        drawCenteredText(ctx, poster.date.toUpperCase(), 302, 825, 260, 26, "#ffffff");
+        drawCenteredText(ctx, poster.time.toUpperCase(), 540, 825, 150, 32, "#f4c95d");
+        drawCenteredText(ctx, poster.stadium.toUpperCase(), 778, 825, 260, 26, "#ffffff");
       }
 
       function roundRect(ctx, x, y, width, height, radius) {

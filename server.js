@@ -42,7 +42,11 @@ const defaultState = {
       { player: "Oyuncu 4", team: "GALATASARAT", value: 0 }
     ]
   },
-  transfers: []
+  transfers: [],
+  season: {
+    startDate: "2026-05-17",
+    endDate: "2026-06-30"
+  }
 };
 
 function json(response, status, body) {
@@ -61,7 +65,11 @@ function normalizeState(input = {}) {
       ...defaultState.stats,
       ...(input.stats && typeof input.stats === "object" ? input.stats : {})
     },
-    transfers: Array.isArray(input.transfers) ? input.transfers : defaultState.transfers
+    transfers: Array.isArray(input.transfers) ? input.transfers : defaultState.transfers,
+    season: {
+      ...defaultState.season,
+      ...(input.season && typeof input.season === "object" ? input.season : {})
+    }
   };
 }
 

@@ -7,6 +7,7 @@ const PORT = Number(process.env.PORT || 4173);
 const ADMIN_USER = process.env.ADMIN_USER;
 const ADMIN_PASS = process.env.ADMIN_PASS;
 const ADMIN_SECRET = process.env.ADMIN_SECRET || crypto.randomBytes(32).toString("hex");
+const TEAM_CODES = parseTeamCodes(process.env.TEAM_CODES);
 const ROOT = __dirname;
 const DATA_DIR = process.env.DATA_DIR || path.join(ROOT, "data");
 const DATA_FILE = path.join(DATA_DIR, "league.json");
@@ -14,19 +15,21 @@ const TOKEN_MAX_AGE_MS = 12 * 60 * 60 * 1000;
 
 const defaultState = {
   teams: [
-    { team: "AJAX", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
-    { team: "GALATASARAT", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
+    { team: "AC MİLAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
+    { team: "GALATASARAY", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
     { team: "ARSENAL", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
     { team: "FENERBAHÇE", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
     { team: "İNTER NAZİONALE MİLAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" }
   ],
   matches: [
-    { home: "AJAX", away: "GALATASARAT", score: "VS", stadium: "League Arena", time: "20:00" },
+    { home: "AC MİLAN", away: "GALATASARAY", score: "VS", stadium: "League Arena", time: "20:00" },
     { home: "ARSENAL", away: "FENERBAHÇE", score: "VS", stadium: "Champions Stadium", time: "18:30" }
   ],
+  liveMatchIndex: 0,
+  news: [],
   stats: {
     goals: [
-      { player: "Mauro Icardi", team: "GALATASARAT", value: 0 },
+      { player: "Mauro Icardi", team: "GALATASARAY", value: 0 },
       { player: "Bukayo Saka", team: "ARSENAL", value: 0 }
     ],
     assists: [
@@ -34,12 +37,12 @@ const defaultState = {
       { player: "Martin Odegaard", team: "ARSENAL", value: 0 }
     ],
     redCards: [
-      { player: "Oyuncu 1", team: "AJAX", value: 0 },
+      { player: "Oyuncu 1", team: "AC MİLAN", value: 0 },
       { player: "Oyuncu 2", team: "İNTER NAZİONALE MİLAN", value: 0 }
     ],
     yellowCards: [
       { player: "Oyuncu 3", team: "FENERBAHÇE", value: 0 },
-      { player: "Oyuncu 4", team: "GALATASARAT", value: 0 }
+      { player: "Oyuncu 4", team: "GALATASARAY", value: 0 }
     ]
   },
   transfers: [],
@@ -48,6 +51,22 @@ const defaultState = {
     endDate: "2026-06-30"
   }
 };
+
+function parseTeamCodes(raw) {
+  const fallback = {
+    "AC MİLAN": "ACMILAN2026",
+    GALATASARAY: "GS2026",
+    ARSENAL: "ARS2026",
+    "FENERBAHÇE": "FB2026",
+    "İNTER NAZİONALE MİLAN": "INTER2026"
+  };
+  if (!raw) return fallback;
+  try {
+    return { ...fallback, ...JSON.parse(raw) };
+  } catch {
+    return fallback;
+  }
+}
 
 function json(response, status, body) {
   response.writeHead(status, {
@@ -58,9 +77,11 @@ function json(response, status, body) {
 }
 
 function normalizeState(input = {}) {
-  return {
+  return migrateLegacyTeamNames({
     teams: Array.isArray(input.teams) ? input.teams : defaultState.teams,
     matches: Array.isArray(input.matches) ? input.matches : defaultState.matches,
+    liveMatchIndex: Number.isInteger(input.liveMatchIndex) ? input.liveMatchIndex : defaultState.liveMatchIndex,
+    news: Array.isArray(input.news) ? input.news : defaultState.news,
     stats: {
       ...defaultState.stats,
       ...(input.stats && typeof input.stats === "object" ? input.stats : {})
@@ -70,6 +91,34 @@ function normalizeState(input = {}) {
       ...defaultState.season,
       ...(input.season && typeof input.season === "object" ? input.season : {})
     }
+  });
+}
+
+function migrateLegacyTeamNames(state) {
+  const renameMap = {
+    AJAX: "AC MİLAN",
+    GALATASARAT: "GALATASARAY"
+  };
+  const rename = (name) => renameMap[name] || name;
+  return {
+    ...state,
+    teams: state.teams.map((team) => ({ ...team, team: rename(team.team) })),
+    matches: state.matches.map((match) => ({
+      ...match,
+      home: rename(match.home),
+      away: rename(match.away)
+    })),
+    transfers: state.transfers.map((transfer) => ({
+      ...transfer,
+      from: rename(transfer.from),
+      to: rename(transfer.to)
+    })),
+    stats: Object.fromEntries(
+      Object.entries(state.stats).map(([key, rows]) => [
+        key,
+        Array.isArray(rows) ? rows.map((row) => ({ ...row, team: rename(row.team) })) : rows
+      ])
+    )
   };
 }
 
@@ -159,6 +208,16 @@ const server = http.createServer(async (request, response) => {
         return json(response, 200, { token: createToken(body.username) });
       }
       return json(response, 401, { message: "Hatalı giriş bilgisi." });
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/team-login") {
+      const body = await readBody(request);
+      const team = String(body.team || "").trim();
+      const code = String(body.code || "").trim();
+      if (TEAM_CODES[team] && TEAM_CODES[team] === code) {
+        return json(response, 200, { team });
+      }
+      return json(response, 401, { message: "Takım kodu hatalı." });
     }
 
     if (request.method === "POST" && url.pathname === "/api/state") {

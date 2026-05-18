@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿<!doctype html>
+﻿﻿﻿﻿﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -785,6 +785,26 @@
         font-weight: 1000;
       }
 
+      .odds-team {
+        min-width: 150px;
+      }
+
+      .odds-bar {
+        width: 100%;
+        min-width: 120px;
+        height: 12px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.09);
+      }
+
+      .odds-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--green), var(--red));
+        box-shadow: 0 0 18px rgba(244, 201, 93, 0.28);
+      }
+
       .transfer-card h4 {
         color: var(--green);
         font-size: 23px;
@@ -1159,7 +1179,7 @@
             <div class="section-head">
               <div>
                 <h3>Oyuncu İstatistikleri</h3>
-                <p>Gol, asist ve kart tabloları</p>
+                <p>Gol, kart ve şampiyonluk yüzdesi tabloları</p>
               </div>
             </div>
             <div id="statsGrid" class="stats-grid"></div>
@@ -1236,10 +1256,6 @@
         goals: [
           { player: "Mauro Icardi", team: "GALATASARAY", value: 0 },
           { player: "Bukayo Saka", team: "ARSENAL", value: 0 }
-        ],
-        assists: [
-          { player: "Dusan Tadic", team: "FENERBAHÇE", value: 0 },
-          { player: "Martin Odegaard", team: "ARSENAL", value: 0 }
         ],
         redCards: [
           { player: "Oyuncu 1", team: "AC MİLAN", value: 0 },
@@ -1943,6 +1959,22 @@
         return [...(state.stats[key] || [])].sort((a, b) => Number(b.value) - Number(a.value)).slice(0, 3);
       }
 
+      function championshipOdds() {
+        const rows = state.teams.map((team) => {
+          const points = Number(team.points) || 0;
+          const wins = Number(team.wins) || 0;
+          const losses = Number(team.losses) || 0;
+          const goalsFor = Number(team.goalsFor) || 0;
+          const average = goalDifference(team);
+          const score = Math.max(0.5, 1 + points * 4 + wins * 3 + Math.max(average, 0) * 1.2 + goalsFor * 0.3 - losses * 1.5);
+          return { ...team, score };
+        });
+        const totalScore = rows.reduce((total, team) => total + team.score, 0) || rows.length || 1;
+        return rows
+          .map((team) => ({ ...team, percent: (team.score / totalScore) * 100 }))
+          .sort((a, b) => b.percent - a.percent || Number(b.points) - Number(a.points) || goalDifference(b) - goalDifference(a) || a.team.localeCompare(b.team, "tr"));
+      }
+
       function summaryRows(rows, valueKey = "points", labelKey = "team") {
         return rows
           .map(
@@ -1950,6 +1982,19 @@
               <div class="summary-item">
                 <span>${index + 1}. ${escapeHtml(row[labelKey] || row.team || row.player)}</span>
                 <strong>${Number(row[valueKey]) || 0}</strong>
+              </div>
+            `
+          )
+          .join("");
+      }
+
+      function summaryPercentRows(rows) {
+        return rows
+          .map(
+            (row, index) => `
+              <div class="summary-item">
+                <span>${index + 1}. ${escapeHtml(row.team)}</span>
+                <strong>${row.percent.toFixed(1)}%</strong>
               </div>
             `
           )
@@ -1998,8 +2043,8 @@
                 <div class="summary-list">${summaryRows(topStats("goals"), "value", "player")}</div>
               </div>
               <div class="summary-card">
-                <h4>Asist Krallığı İlk 3</h4>
-                <div class="summary-list">${summaryRows(topStats("assists"), "value", "player")}</div>
+                <h4>Şampiyonluk Yüzdesi İlk 3</h4>
+                <div class="summary-list">${summaryPercentRows(championshipOdds().slice(0, 3))}</div>
               </div>
             </div>
           </div>
@@ -2089,12 +2134,11 @@
       function renderStats() {
         const statConfig = [
           { key: "goals", title: "Gol Krallığı", label: "Gol" },
-          { key: "assists", title: "Asist Krallığı", label: "Asist" },
           { key: "redCards", title: "Kırmızı Kart Görenler", label: "Kırmızı" },
           { key: "yellowCards", title: "Sarı Kart Görenler", label: "Sarı" }
         ];
 
-        elements.statsGrid.innerHTML = statConfig
+        const statCards = statConfig
           .map((config) => {
             const rows = [...(state.stats[config.key] || [])].sort((a, b) => Number(b.value) - Number(a.value));
             const body = rows.length
@@ -2150,6 +2194,49 @@
             `;
           })
           .join("");
+
+        const oddsRows = championshipOdds()
+          .map(
+            (team, index) => `
+              <tr>
+                <td class="rank">${index + 1}</td>
+                <td class="odds-team">
+                  <div class="club">
+                    ${logoMarkup(team.team)}
+                    <span>${escapeHtml(team.team)}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="odds-bar" aria-label="${team.percent.toFixed(1)}%">
+                    <div class="odds-fill" style="width: ${Math.max(3, team.percent).toFixed(1)}%;"></div>
+                  </div>
+                </td>
+                <td class="stats-value">${team.percent.toFixed(1)}%</td>
+              </tr>
+            `
+          )
+          .join("");
+
+        const oddsCard = `
+          <article class="stats-card">
+            <div class="stats-card-head">
+              <h4>Şampiyonluk Yüzdesi</h4>
+            </div>
+            <table class="stats-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Takım</th>
+                  <th>Durum</th>
+                  <th>Yüzde</th>
+                </tr>
+              </thead>
+              <tbody>${oddsRows}</tbody>
+            </table>
+          </article>
+        `;
+
+        elements.statsGrid.innerHTML = oddsCard + statCards;
       }
 
       function renderTransfers() {
@@ -2499,7 +2586,6 @@
         const row = index === null ? { player: "", team: state.teams[0]?.team || "", value: 0 } : state.stats[statKey][index];
         const titles = {
           goals: "Gol kaydı",
-          assists: "Asist kaydı",
           redCards: "Kırmızı kart kaydı",
           yellowCards: "Sarı kart kaydı"
         };

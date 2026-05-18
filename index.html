@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿<!doctype html>
+﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -481,6 +481,53 @@
 
       .table-wrap {
         overflow-x: auto;
+      }
+
+      .standings-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.72fr);
+        align-items: start;
+        gap: 18px;
+      }
+
+      .odds-card {
+        position: sticky;
+        top: 96px;
+        border-radius: 18px;
+        padding: 22px;
+      }
+
+      .odds-card h4 {
+        color: white;
+        font-size: 23px;
+        font-weight: 1000;
+        margin-bottom: 6px;
+      }
+
+      .odds-card p {
+        margin-bottom: 18px;
+        color: rgba(255, 255, 255, 0.52);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .odds-list {
+        display: grid;
+        gap: 14px;
+      }
+
+      .odds-row {
+        display: grid;
+        gap: 8px;
+      }
+
+      .odds-row-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        color: white;
+        font-weight: 1000;
       }
 
       table {
@@ -1050,6 +1097,7 @@
 
       @media (max-width: 820px) {
         .hero-grid,
+        .standings-layout,
         .transfer-grid,
         .stats-grid,
         .news-grid,
@@ -1214,26 +1262,33 @@
                 <p>Lig Tablosu</p>
               </div>
             </div>
-            <div class="panel table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Takım</th>
-                    <th>O</th>
-                    <th>G</th>
-                    <th>B</th>
-                    <th>M</th>
-                    <th>AG</th>
-                    <th>YG</th>
-                    <th>AV</th>
-                    <th>P</th>
-                    <th>Form</th>
-                    <th>Yetki</th>
-                  </tr>
-                </thead>
-                <tbody id="standingsBody"></tbody>
-              </table>
+            <div class="standings-layout">
+              <div class="panel table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Takım</th>
+                      <th>O</th>
+                      <th>G</th>
+                      <th>B</th>
+                      <th>M</th>
+                      <th>AG</th>
+                      <th>YG</th>
+                      <th>AV</th>
+                      <th>P</th>
+                      <th>Form</th>
+                      <th>Yetki</th>
+                    </tr>
+                  </thead>
+                  <tbody id="standingsBody"></tbody>
+                </table>
+              </div>
+              <aside class="panel odds-card">
+                <h4>Şampiyonluk Yüzdesi</h4>
+                <p>Puan durumu değiştikçe otomatik güncellenir.</p>
+                <div id="championshipOddsPanel" class="odds-list"></div>
+              </aside>
             </div>
           </div>
         </section>
@@ -1465,6 +1520,7 @@
         championPanel: document.getElementById("championPanel"),
         seasonSummary: document.getElementById("seasonSummary"),
         standingsBody: document.getElementById("standingsBody"),
+        championshipOddsPanel: document.getElementById("championshipOddsPanel"),
         matchesGrid: document.getElementById("matchesGrid"),
         statsGrid: document.getElementById("statsGrid"),
         transferGrid: document.getElementById("transferGrid"),
@@ -2248,6 +2304,28 @@
             `;
           })
           .join("");
+        renderChampionshipOddsPanel();
+      }
+
+      function renderChampionshipOddsPanel() {
+        elements.championshipOddsPanel.innerHTML = championshipOdds()
+          .map(
+            (team, index) => `
+              <div class="odds-row">
+                <div class="odds-row-head">
+                  <div class="club">
+                    ${logoMarkup(team.team)}
+                    <span>${index + 1}. ${escapeHtml(team.team)}</span>
+                  </div>
+                  <strong>${team.percent.toFixed(1)}%</strong>
+                </div>
+                <div class="odds-bar" aria-label="${team.percent.toFixed(1)}%">
+                  <div class="odds-fill" style="width: ${Math.max(3, team.percent).toFixed(1)}%;"></div>
+                </div>
+              </div>
+            `
+          )
+          .join("");
       }
 
       function renderMatches() {
@@ -2358,48 +2436,7 @@
           })
           .join("");
 
-        const oddsRows = championshipOdds()
-          .map(
-            (team, index) => `
-              <tr>
-                <td class="rank">${index + 1}</td>
-                <td class="odds-team">
-                  <div class="club">
-                    ${logoMarkup(team.team)}
-                    <span>${escapeHtml(team.team)}</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="odds-bar" aria-label="${team.percent.toFixed(1)}%">
-                    <div class="odds-fill" style="width: ${Math.max(3, team.percent).toFixed(1)}%;"></div>
-                  </div>
-                </td>
-                <td class="stats-value">${team.percent.toFixed(1)}%</td>
-              </tr>
-            `
-          )
-          .join("");
-
-        const oddsCard = `
-          <article class="stats-card">
-            <div class="stats-card-head">
-              <h4>Şampiyonluk Yüzdesi</h4>
-            </div>
-            <table class="stats-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Takım</th>
-                  <th>Durum</th>
-                  <th>Yüzde</th>
-                </tr>
-              </thead>
-              <tbody>${oddsRows}</tbody>
-            </table>
-          </article>
-        `;
-
-        elements.statsGrid.innerHTML = oddsCard + statCards;
+        elements.statsGrid.innerHTML = statCards;
       }
 
       function renderTransfers() {

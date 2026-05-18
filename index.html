@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -852,6 +852,13 @@
       .news-body p {
         color: rgba(255, 255, 255, 0.66);
         line-height: 1.5;
+      }
+
+      .news-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
       }
 
       .poster-tool {
@@ -1894,12 +1901,167 @@
                 <div class="news-body">
                   <h4>${escapeHtml(item.title || "Haber")}</h4>
                   <p>${escapeHtml(item.text || "")}</p>
-                  ${state.isAdmin ? `<div class="score-actions"><button class="button small ghost-danger" data-action="delete-news" data-index="${index}">Sil</button></div>` : ""}
+                  <div class="news-actions">
+                    <button class="button small secondary" data-action="share-news" data-index="${index}">Paylaş</button>
+                    <button class="button small" data-action="download-news" data-index="${index}">Görsel İndir</button>
+                    ${state.isAdmin ? `<button class="button small ghost-danger" data-action="delete-news" data-index="${index}">Sil</button>` : ""}
+                  </div>
                 </div>
               </article>
             `
           )
           .join("");
+      }
+
+      function newsShareText(item) {
+        const title = item.title || "Şampuanlar Ligi Haberi";
+        const text = item.text || "";
+        const url = location.origin && location.origin !== "null" ? location.origin : "https://sampuanlar-ligi.onrender.com";
+        return `${title}\n\n${text}\n\n${url}`;
+      }
+
+      async function shareNews(index) {
+        const item = state.news[index];
+        if (!item) return;
+        const shareData = {
+          title: item.title || "Şampuanlar Ligi Haberi",
+          text: newsShareText(item),
+          url: location.origin && location.origin !== "null" ? location.origin : "https://sampuanlar-ligi.onrender.com"
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+            return;
+          }
+          await navigator.clipboard.writeText(shareData.text);
+          showToast("Haber paylaşım metni kopyalandı.");
+        } catch (error) {
+          if (error.name !== "AbortError") showToast("Paylaşım yapılamadı.");
+        }
+      }
+
+      function loadNewsImage(src) {
+        return new Promise((resolve) => {
+          if (!src) {
+            resolve(null);
+            return;
+          }
+          const image = new Image();
+          image.crossOrigin = "anonymous";
+          image.onload = () => resolve(image);
+          image.onerror = () => resolve(null);
+          image.src = src;
+        });
+      }
+
+      function drawCoverImage(ctx, image, x, y, width, height) {
+        const ratio = Math.max(width / image.width, height / image.height);
+        const drawWidth = image.width * ratio;
+        const drawHeight = image.height * ratio;
+        ctx.drawImage(image, x + (width - drawWidth) / 2, y + (height - drawHeight) / 2, drawWidth, drawHeight);
+      }
+
+      function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+        const words = String(text || "").split(/\s+/).filter(Boolean);
+        const lines = [];
+        let line = "";
+        words.forEach((word) => {
+          const test = line ? `${line} ${word}` : word;
+          if (ctx.measureText(test).width > maxWidth && line) {
+            lines.push(line);
+            line = word;
+          } else {
+            line = test;
+          }
+        });
+        if (line) lines.push(line);
+        lines.slice(0, maxLines).forEach((item, index) => {
+          const suffix = index === maxLines - 1 && lines.length > maxLines ? "..." : "";
+          ctx.fillText(`${item}${suffix}`, x, y + index * lineHeight);
+        });
+      }
+
+      async function drawNewsPoster(item, includeImage = true) {
+        const canvas = document.createElement("canvas");
+        canvas.width = 1080;
+        canvas.height = 1080;
+        const ctx = canvas.getContext("2d");
+
+        const bg = ctx.createLinearGradient(0, 0, 1080, 1080);
+        bg.addColorStop(0, "#07080c");
+        bg.addColorStop(0.48, "#171018");
+        bg.addColorStop(1, "#2a0d13");
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, 1080, 1080);
+
+        const glow = ctx.createRadialGradient(880, 140, 0, 880, 140, 520);
+        glow.addColorStop(0, "rgba(244,201,93,0.34)");
+        glow.addColorStop(1, "rgba(244,201,93,0)");
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, 1080, 1080);
+
+        const image = includeImage ? await loadNewsImage(item.image) : null;
+        if (image) {
+          ctx.save();
+          roundRect(ctx, 72, 72, 936, 560, 42);
+          ctx.clip();
+          drawCoverImage(ctx, image, 72, 72, 936, 560);
+          ctx.restore();
+        } else {
+          ctx.fillStyle = "rgba(255,255,255,0.08)";
+          roundRect(ctx, 72, 72, 936, 560, 42);
+          ctx.fill();
+          drawCenteredText(ctx, "ŞAMPUANLAR LİGİ", 540, 352, 720, 54, "#f4c95d");
+        }
+
+        ctx.fillStyle = "rgba(0,0,0,0.76)";
+        roundRect(ctx, 72, 560, 936, 430, 42);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(244,201,93,0.35)";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.fillStyle = "#f4c95d";
+        ctx.font = "900 30px Arial";
+        ctx.textAlign = "left";
+        ctx.fillText("ŞAMPUANLAR LİGİ HABER", 120, 634);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "1000 58px Arial";
+        drawWrappedText(ctx, item.title || "Haber", 120, 720, 840, 68, 2);
+
+        ctx.fillStyle = "rgba(255,255,255,0.74)";
+        ctx.font = "800 32px Arial";
+        drawWrappedText(ctx, item.text || "", 120, 860, 840, 42, 3);
+
+        ctx.fillStyle = "rgba(255,255,255,0.58)";
+        ctx.font = "800 24px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("sampuanlar-ligi.onrender.com", 540, 1030);
+        return canvas;
+      }
+
+      async function downloadNewsPoster(index) {
+        const item = state.news[index];
+        if (!item) return;
+        let canvas = await drawNewsPoster(item, true);
+        let blob = null;
+        try {
+          blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        } catch {
+          canvas = await drawNewsPoster(item, false);
+          blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        }
+        if (!blob) {
+          showToast("Görsel indirilemedi.");
+          return;
+        }
+        const link = document.createElement("a");
+        const safeTitle = String(item.title || "haber").toLocaleLowerCase("tr-TR").replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "haber";
+        link.download = `sampuanlar-ligi-${safeTitle}.png`;
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        URL.revokeObjectURL(link.href);
       }
 
       function renderFixturePosterTool() {
@@ -2678,10 +2840,22 @@
 
       document.addEventListener("click", async (event) => {
         const button = event.target.closest("[data-action]");
-        if (!button || !state.isAdmin) return;
+        if (!button) return;
 
         const action = button.dataset.action;
         const index = Number(button.dataset.index);
+
+        if (action === "share-news") {
+          await shareNews(index);
+          return;
+        }
+
+        if (action === "download-news") {
+          await downloadNewsPoster(index);
+          return;
+        }
+
+        if (!state.isAdmin) return;
 
         if (action === "edit-team") {
           const team = state.teams[index];

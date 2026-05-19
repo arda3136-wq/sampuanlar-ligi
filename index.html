@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -6,18 +6,18 @@
     <title>LOS PESİCOS</title>
     <style>
       :root {
-        --bg: #0b0d12;
-        --panel: rgba(255, 255, 255, 0.065);
-        --panel-strong: #171018;
-        --line: rgba(255, 255, 255, 0.13);
-        --muted: rgba(255, 255, 255, 0.66);
+        --bg: #102936;
+        --panel: rgba(255, 255, 255, 0.09);
+        --panel-strong: #173847;
+        --line: rgba(255, 255, 255, 0.18);
+        --muted: rgba(255, 255, 255, 0.72);
         --soft: rgba(255, 255, 255, 0.09);
-        --green: #f4c95d;
-        --green-dark: #c98a1d;
-        --yellow: #f4c95d;
-        --red: #e23b4a;
+        --green: #7ee7c8;
+        --green-dark: #2fb896;
+        --yellow: #ffd166;
+        --red: #ff6b6b;
         --text: #ffffff;
-        --black: #07110d;
+        --black: #09212b;
       }
 
       * {
@@ -28,10 +28,10 @@
         margin: 0;
         min-height: 100vh;
         background:
-          radial-gradient(circle at 14% 8%, rgba(226, 59, 74, 0.22), transparent 30rem),
-          radial-gradient(circle at 88% 2%, rgba(244, 201, 93, 0.16), transparent 26rem),
-          radial-gradient(circle at 50% 86%, rgba(109, 40, 217, 0.1), transparent 34rem),
-          linear-gradient(180deg, #0b0d12 0%, #151018 48%, #08090e 100%);
+          radial-gradient(circle at 12% 8%, rgba(126, 231, 200, 0.22), transparent 30rem),
+          radial-gradient(circle at 88% 2%, rgba(255, 209, 102, 0.2), transparent 26rem),
+          radial-gradient(circle at 54% 86%, rgba(99, 179, 237, 0.16), transparent 34rem),
+          linear-gradient(180deg, #102936 0%, #14394a 48%, #0d2430 100%);
         color: var(--text);
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
@@ -79,7 +79,7 @@
         top: 0;
         z-index: 10;
         border-bottom: 1px solid var(--line);
-        background: rgba(0, 0, 0, 0.58);
+        background: rgba(8, 31, 42, 0.72);
         backdrop-filter: blur(18px);
       }
 
@@ -157,7 +157,7 @@
         gap: 8px;
         border-radius: 14px;
         padding: 11px 16px;
-        background: var(--green);
+        background: linear-gradient(135deg, #7ee7c8, #ffd166);
         color: var(--black);
         font-weight: 900;
         transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
@@ -166,8 +166,8 @@
 
       .button:hover {
         transform: translateY(-1px);
-        background: #ffd978;
-        box-shadow: 0 14px 34px rgba(244, 201, 93, 0.22);
+        background: linear-gradient(135deg, #9af3dc, #ffe08a);
+        box-shadow: 0 14px 34px rgba(126, 231, 200, 0.2);
       }
 
       .button.secondary {
@@ -228,7 +228,7 @@
 
       .hero h2 span {
         display: block;
-        color: var(--green);
+        color: #7ee7c8;
       }
 
       .hero-copy {
@@ -246,6 +246,48 @@
         margin-top: 28px;
       }
 
+      .tab-nav {
+        position: sticky;
+        top: 83px;
+        z-index: 8;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(16, 41, 54, 0.82);
+        backdrop-filter: blur(16px);
+        padding: 12px 0;
+      }
+
+      .tab-list {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+
+      .tab-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.78);
+        padding: 10px 15px;
+        font-weight: 950;
+        white-space: nowrap;
+      }
+
+      .tab-button.active {
+        border-color: rgba(126, 231, 200, 0.42);
+        background: linear-gradient(135deg, rgba(126, 231, 200, 0.24), rgba(255, 209, 102, 0.12));
+        color: white;
+        box-shadow: 0 14px 34px rgba(126, 231, 200, 0.12);
+      }
+
+      .tab-panel[hidden] {
+        display: none !important;
+      }
+
       .match-highlight,
       .panel,
       .match-card,
@@ -260,8 +302,8 @@
         border-radius: 18px;
         padding: clamp(20px, 4vw, 30px);
         background:
-          linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.045)),
-          radial-gradient(circle at 18% 10%, rgba(244, 201, 93, 0.18), transparent 18rem);
+          linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06)),
+          radial-gradient(circle at 18% 10%, rgba(126, 231, 200, 0.18), transparent 18rem);
       }
 
       .season-panel,
@@ -426,8 +468,8 @@
       .scoreboard {
         border-radius: 18px;
         background:
-          linear-gradient(135deg, rgba(16, 26, 46, 0.96), rgba(9, 16, 30, 0.96)),
-          linear-gradient(90deg, rgba(244, 201, 93, 0.12), transparent);
+          linear-gradient(135deg, rgba(19, 58, 74, 0.94), rgba(12, 41, 55, 0.94)),
+          linear-gradient(90deg, rgba(126, 231, 200, 0.14), transparent);
         padding: clamp(18px, 4vw, 34px);
       }
 
@@ -1189,10 +1231,10 @@
       .admin-panel {
         margin-bottom: 52px;
         border-radius: 18px;
-        background: linear-gradient(135deg, #f4c95d, #e23b4a);
+        background: linear-gradient(135deg, #7ee7c8, #ffd166 58%, #8fc8ff);
         color: var(--black);
         padding: clamp(24px, 5vw, 42px);
-        box-shadow: 0 24px 80px rgba(226, 59, 74, 0.18);
+        box-shadow: 0 24px 80px rgba(126, 231, 200, 0.16);
       }
 
       .admin-panel h3 {
@@ -1225,7 +1267,7 @@
         width: min(460px, calc(100% - 28px));
         border: 1px solid var(--line);
         border-radius: 18px;
-        background: #0d1728;
+        background: #123344;
         color: white;
         box-shadow: 0 28px 80px rgba(0, 0, 0, 0.46);
         padding: 0;
@@ -1289,7 +1331,7 @@
         max-width: min(420px, calc(100% - 36px));
         border: 1px solid var(--line);
         border-radius: 14px;
-        background: rgba(10, 18, 32, 0.94);
+        background: rgba(13, 48, 62, 0.94);
         color: white;
         padding: 13px 15px;
         font-weight: 800;
@@ -1429,8 +1471,8 @@
                 Lig yarışı, ŞAMPUANLAR LİGİ bileti, ön eleme hattı, canlı maçlar ve haber akışıyla daha rekabetçi bir futbol merkezi.
               </p>
               <div class="hero-actions">
-                <a class="button" href="#standings">Puan Durumuna Git</a>
-                <a class="button secondary" href="#matches">Maçları Gör</a>
+                <button class="button" data-tab-target="lig" type="button">Puan Durumuna Git</button>
+                <button class="button secondary" data-tab-target="fixtures" type="button">Maçları Gör</button>
               </div>
             </div>
 
@@ -1444,19 +1486,29 @@
           </div>
         </section>
 
-        <section class="section">
+        <nav class="tab-nav">
+          <div class="container tab-list">
+            <button class="tab-button active" data-tab-target="lig" type="button">Lig</button>
+            <button class="tab-button" data-tab-target="champions" type="button">Şampuanlar Ligi</button>
+            <button class="tab-button" data-tab-target="fixtures" type="button">Fikstür</button>
+            <button class="tab-button" data-tab-target="news" type="button">Haberler</button>
+            <button class="tab-button" data-tab-target="stats" type="button">İstatistikler</button>
+          </div>
+        </nav>
+
+        <section class="section tab-panel" data-tab-panel="lig">
           <div class="container">
             <div id="seasonPanel" class="season-panel"></div>
           </div>
         </section>
 
-        <section id="teamOwnerSection" class="section" style="display: none;">
+        <section id="teamOwnerSection" class="section tab-panel" data-tab-panel="lig" style="display: none;">
           <div class="container">
             <div id="teamOwnerPanel" class="team-owner-panel"></div>
           </div>
         </section>
 
-        <section class="section">
+        <section class="section tab-panel" data-tab-panel="news">
           <div class="container">
             <div class="section-head">
               <div>
@@ -1469,7 +1521,7 @@
           </div>
         </section>
 
-        <section id="standings" class="section">
+        <section id="standings" class="section tab-panel" data-tab-panel="lig">
           <div class="container">
             <div id="championPanel"></div>
             <div id="seasonSummary"></div>
@@ -1514,7 +1566,7 @@
           </div>
         </section>
 
-        <section id="matches" class="section">
+        <section id="matches" class="section tab-panel" data-tab-panel="fixtures">
           <div class="container">
             <div class="section-head">
               <div>
@@ -1527,7 +1579,7 @@
           </div>
         </section>
 
-        <section id="championsLeagueSection" class="section">
+        <section id="championsLeagueSection" class="section tab-panel" data-tab-panel="champions">
           <div class="container">
             <div class="section-head">
               <div class="league-stage-head">
@@ -1605,19 +1657,19 @@
           </div>
         </section>
 
-        <section class="section">
+        <section class="section tab-panel" data-tab-panel="stats">
           <div class="container">
             <div class="section-head">
               <div>
                 <h3>Oyuncu İstatistikleri</h3>
-                <p>Gol, kart ve şampiyonluk yüzdesi tabloları</p>
+                <p>Gol ve kart tabloları</p>
               </div>
             </div>
             <div id="statsGrid" class="stats-grid"></div>
           </div>
         </section>
 
-        <section class="section">
+        <section class="section tab-panel" data-tab-panel="stats">
           <div class="container">
             <div class="section-head">
               <div>
@@ -1630,7 +1682,7 @@
           </div>
         </section>
 
-        <section class="section">
+        <section class="section tab-panel" data-tab-panel="stats">
           <div class="container">
             <div class="admin-panel">
               <h3>Admin Paneli</h3>
@@ -1790,6 +1842,7 @@
 
       let activeSubmit = null;
       let toastTimer = null;
+      let activeTab = "lig";
       const logoImageCache = new Map();
 
       function load(key, fallback) {
@@ -2084,6 +2137,7 @@
 
       function render() {
         renderLeagueIdentity();
+        renderTabs();
         renderAdminState();
         renderLiveMatch();
         renderSeason();
@@ -2095,6 +2149,20 @@
         renderChampionsLeague();
         renderStats();
         renderTransfers();
+      }
+
+      function setActiveTab(tabName) {
+        activeTab = tabName || "lig";
+        renderTabs();
+      }
+
+      function renderTabs() {
+        document.querySelectorAll("[data-tab-panel]").forEach((panel) => {
+          panel.hidden = panel.dataset.tabPanel !== activeTab;
+        });
+        document.querySelectorAll("[data-tab-target]").forEach((button) => {
+          button.classList.toggle("active", button.dataset.tabTarget === activeTab);
+        });
       }
 
       function renderAdminState() {
@@ -2988,6 +3056,13 @@
       });
 
       elements.cancelDialog.addEventListener("click", () => elements.dialog.close());
+
+      document.addEventListener("click", (event) => {
+        const tabButton = event.target.closest("[data-tab-target]");
+        if (!tabButton) return;
+        setActiveTab(tabButton.dataset.tabTarget);
+        document.querySelector(".tab-nav")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
 
       elements.adminButton.addEventListener("click", () => {
         if (state.isAdmin) {

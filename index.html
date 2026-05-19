@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -52,7 +52,21 @@
       }
 
       .app {
+        position: relative;
         min-height: 100vh;
+      }
+
+      .app::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+        background-size: 76px 76px;
+        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.72), transparent 82%);
       }
 
       .container {
@@ -98,11 +112,13 @@
         flex: 0 0 50px;
         place-items: center;
         border-radius: 14px;
-        background: var(--green);
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.26), transparent 38%),
+          linear-gradient(135deg, #f4c95d, #e23b4a 72%);
         color: var(--black);
         font-size: 20px;
         font-weight: 1000;
-        box-shadow: 0 16px 42px rgba(244, 201, 93, 0.22);
+        box-shadow: 0 16px 42px rgba(244, 201, 93, 0.22), inset 0 0 0 1px rgba(255, 255, 255, 0.28);
         overflow: hidden;
       }
 
@@ -243,6 +259,9 @@
       .match-highlight {
         border-radius: 18px;
         padding: clamp(20px, 4vw, 30px);
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.045)),
+          radial-gradient(circle at 18% 10%, rgba(244, 201, 93, 0.18), transparent 18rem);
       }
 
       .season-panel,
@@ -486,6 +505,14 @@
         padding: clamp(14px, 3vw, 26px);
       }
 
+      .panel,
+      .season-panel,
+      .summary-panel,
+      .news-card,
+      .team-owner-panel {
+        backdrop-filter: blur(12px);
+      }
+
       .table-wrap {
         overflow-x: auto;
       }
@@ -545,15 +572,19 @@
 
       .league-stage-logo {
         display: grid;
-        width: 58px;
-        height: 58px;
-        flex: 0 0 58px;
+        width: 68px;
+        height: 68px;
+        flex: 0 0 68px;
         place-items: center;
-        border-radius: 16px;
-        background: linear-gradient(135deg, #f4c95d, #e23b4a);
+        border-radius: 20px;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent 36%),
+          linear-gradient(135deg, #f4c95d, #e23b4a 58%, #4aa3ff);
         color: var(--black);
+        font-size: 22px;
         font-weight: 1000;
         overflow: hidden;
+        box-shadow: 0 22px 54px rgba(226, 59, 74, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.32);
       }
 
       .league-stage-logo img {
@@ -565,22 +596,45 @@
       .group-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
+        gap: 20px;
       }
 
       .group-card {
+        position: relative;
+        overflow: hidden;
         border-radius: 18px;
-        padding: 22px;
+        padding: 24px;
+        background:
+          linear-gradient(150deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.045)),
+          radial-gradient(circle at 18% 0%, rgba(244, 201, 93, 0.2), transparent 16rem),
+          radial-gradient(circle at 92% 18%, rgba(74, 163, 255, 0.14), transparent 14rem);
+      }
+
+      .group-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(115deg, transparent 0 42%, rgba(255, 255, 255, 0.08) 42% 44%, transparent 44%),
+          linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+        background-size: auto, 100% 52px;
+        opacity: 0.65;
       }
 
       .group-card h4 {
+        position: relative;
+        z-index: 1;
         color: var(--green);
-        font-size: 24px;
+        font-size: 26px;
         font-weight: 1000;
+        letter-spacing: 0;
         margin-bottom: 16px;
       }
 
       .group-team-list {
+        position: relative;
+        z-index: 1;
         display: grid;
         gap: 12px;
       }
@@ -591,8 +645,52 @@
         justify-content: space-between;
         gap: 12px;
         border-radius: 14px;
-        background: rgba(255, 255, 255, 0.07);
-        padding: 12px;
+        background: rgba(7, 8, 12, 0.46);
+        padding: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.11);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+      }
+
+      .group-team strong {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border-radius: 50%;
+        background: rgba(244, 201, 93, 0.16);
+        color: #f4c95d;
+        font-weight: 1000;
+      }
+
+      .group-team small {
+        display: block;
+        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.48);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .group-note {
+        position: relative;
+        z-index: 1;
+        margin-top: 16px;
+        color: rgba(255, 255, 255, 0.54);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      #championsLeagueSection {
+        position: relative;
+      }
+
+      #championsLeagueSection .container {
+        border: 1px solid rgba(244, 201, 93, 0.18);
+        border-radius: 24px;
+        padding: clamp(18px, 3vw, 28px);
+        background:
+          linear-gradient(135deg, rgba(244, 201, 93, 0.08), rgba(226, 59, 74, 0.07) 45%, rgba(74, 163, 255, 0.06)),
+          rgba(255, 255, 255, 0.025);
+        box-shadow: 0 28px 90px rgba(0, 0, 0, 0.24);
       }
 
       table {
@@ -621,11 +719,18 @@
       }
 
       .qualification-champions td {
-        background: rgba(244, 201, 93, 0.11);
+        background:
+          linear-gradient(90deg, rgba(244, 201, 93, 0.17), rgba(244, 201, 93, 0.045));
       }
 
       .qualification-playoff td {
-        background: rgba(57, 255, 136, 0.075);
+        background:
+          linear-gradient(90deg, rgba(70, 160, 255, 0.14), rgba(57, 255, 136, 0.035));
+      }
+
+      .qualification-champions .rank,
+      .qualification-playoff .rank {
+        color: white;
       }
 
       .qualification-badge {
@@ -640,13 +745,22 @@
       }
 
       .qualification-badge.champions {
-        background: rgba(244, 201, 93, 0.18);
+        background: linear-gradient(135deg, rgba(244, 201, 93, 0.26), rgba(226, 59, 74, 0.16));
         color: #f4c95d;
+        box-shadow: inset 0 0 0 1px rgba(244, 201, 93, 0.18);
       }
 
       .qualification-badge.playoff {
-        background: rgba(57, 255, 136, 0.13);
-        color: var(--green);
+        background: linear-gradient(135deg, rgba(74, 163, 255, 0.2), rgba(57, 255, 136, 0.09));
+        color: #8fc8ff;
+        box-shadow: inset 0 0 0 1px rgba(143, 200, 255, 0.18);
+      }
+
+      .qualification-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
       }
 
       .rank {
@@ -1310,9 +1424,9 @@
           <div class="container hero-grid">
             <div>
               <span class="pill">Yeni Sezon Başlıyor</span>
-              <h2>Gerçek Futbol <span>Lig Sistemi</span></h2>
+              <h2>LOS PESİCOS <span>Sahnesi</span></h2>
               <p class="hero-copy">
-                Admin paneli, canlı skor sistemi, transfer yönetimi ve takım istatistikleri ile modern futbol ligi deneyimi.
+                Lig yarışı, ŞAMPUANLAR LİGİ bileti, ön eleme hattı, canlı maçlar ve haber akışıyla daha rekabetçi bir futbol merkezi.
               </p>
               <div class="hero-actions">
                 <a class="button" href="#standings">Puan Durumuna Git</a>
@@ -1363,6 +1477,10 @@
               <div>
                 <h3>Puan Durumu</h3>
                 <p>Lig Tablosu</p>
+                <div class="qualification-legend">
+                  <span class="qualification-badge champions">İlk 3: Şampuanlar Ligi</span>
+                  <span class="qualification-badge playoff">4-5: Ön Eleme</span>
+                </div>
               </div>
             </div>
             <div class="standings-layout">
@@ -1416,7 +1534,7 @@
                 <div id="championsLeagueLogo" class="league-stage-logo">ŞL</div>
                 <div>
                   <h3 id="championsLeagueTitle">ŞAMPUANLAR LİGİ</h3>
-                  <p>Grup aşaması</p>
+                  <p>Normal ligden gelen takımlar için özel grup aşaması</p>
                 </div>
               </div>
               <button id="championsSettingsButton" class="button" style="display: none;">Grupları Düzenle</button>
@@ -2729,7 +2847,10 @@
                   <div class="group-team">
                     <div class="club">
                       ${logoMarkup(team.team)}
-                      <span>${escapeHtml(team.team)}</span>
+                      <span>
+                        ${escapeHtml(team.team)}
+                        <small>Grup mücadelesi</small>
+                      </span>
                     </div>
                     <strong>${index + 1}</strong>
                   </div>
@@ -2740,6 +2861,7 @@
               <article class="panel group-card">
                 <h4>Grup ${escapeHtml(groupName)}</h4>
                 <div class="group-team-list">${rows}</div>
+                <div class="group-note">İlk sırayı alan takım üst tura yükselir.</div>
               </article>
             `;
           })

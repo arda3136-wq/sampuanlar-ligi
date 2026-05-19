@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -638,7 +638,8 @@
       .group-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 20px;
+        gap: clamp(28px, 6vw, 72px);
+        margin-top: 28px;
       }
 
       .group-card {
@@ -726,13 +727,88 @@
       }
 
       #championsLeagueSection .container {
+        position: relative;
+        overflow: hidden;
         border: 1px solid rgba(244, 201, 93, 0.18);
         border-radius: 24px;
         padding: clamp(18px, 3vw, 28px);
         background:
-          linear-gradient(135deg, rgba(244, 201, 93, 0.08), rgba(226, 59, 74, 0.07) 45%, rgba(74, 163, 255, 0.06)),
-          rgba(255, 255, 255, 0.025);
+          linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.055)),
+          radial-gradient(circle at 20% 12%, rgba(255, 209, 102, 0.2), transparent 22rem),
+          radial-gradient(circle at 92% 18%, rgba(143, 200, 255, 0.22), transparent 20rem),
+          rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(18px);
         box-shadow: 0 28px 90px rgba(0, 0, 0, 0.24);
+      }
+
+      #championsLeagueSection .container::before {
+        content: var(--champions-watermark, "ŞL");
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: rgba(255, 255, 255, 0.055);
+        font-size: clamp(150px, 24vw, 330px);
+        font-weight: 1000;
+        letter-spacing: 0;
+        transform: rotate(-10deg);
+        pointer-events: none;
+      }
+
+      #championsLeagueSection .container.has-logo::before {
+        content: "";
+        background-image: var(--champions-logo);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: min(62vw, 620px);
+        opacity: 0.09;
+        filter: saturate(1.1);
+        transform: rotate(-8deg) scale(1.08);
+      }
+
+      #championsLeagueSection .section-head,
+      #championsGroupsGrid,
+      .final-path {
+        position: relative;
+        z-index: 1;
+      }
+
+      .final-path {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 18px;
+        margin-top: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 20px;
+        background: rgba(8, 31, 42, 0.42);
+        padding: 18px;
+      }
+
+      .winner-card {
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.08);
+        padding: 16px;
+      }
+
+      .winner-label {
+        margin-bottom: 10px;
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 12px;
+        font-weight: 1000;
+        text-transform: uppercase;
+      }
+
+      .final-center {
+        display: grid;
+        min-width: 108px;
+        min-height: 70px;
+        place-items: center;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(255, 209, 102, 0.24), rgba(126, 231, 200, 0.16));
+        color: white;
+        font-size: 28px;
+        font-weight: 1000;
       }
 
       table {
@@ -1413,7 +1489,8 @@
         }
 
         .score-row,
-        .fixture {
+        .fixture,
+        .final-path {
           grid-template-columns: 1fr;
         }
 
@@ -1592,6 +1669,7 @@
               <button id="championsSettingsButton" class="button" style="display: none;">Grupları Düzenle</button>
             </div>
             <div id="championsGroupsGrid" class="group-grid"></div>
+            <div id="championsFinalPath" class="final-path"></div>
           </div>
         </section>
 
@@ -1803,6 +1881,7 @@
         championsLeagueLogo: document.getElementById("championsLeagueLogo"),
         championsLeagueTitle: document.getElementById("championsLeagueTitle"),
         championsGroupsGrid: document.getElementById("championsGroupsGrid"),
+        championsFinalPath: document.getElementById("championsFinalPath"),
         addMatchButton: document.getElementById("addMatchButton"),
         addTransferButton: document.getElementById("addTransferButton"),
         addNewsButton: document.getElementById("addNewsButton"),
@@ -2900,6 +2979,12 @@
 
       function renderChampionsLeague() {
         const settings = normalizeLeagueSettings(state.leagueSettings);
+        const container = document.querySelector("#championsLeagueSection .container");
+        if (container) {
+          container.classList.toggle("has-logo", Boolean(settings.championsLogo));
+          container.style.setProperty("--champions-logo", `url("${settings.championsLogo}")`);
+          container.style.setProperty("--champions-watermark", `"${initials(settings.championsName)}"`);
+        }
         elements.championsGroupsGrid.innerHTML = Object.entries(settings.championsGroups)
           .map(([groupName, teams]) => {
             const rows = teams
@@ -2928,6 +3013,25 @@
             `;
           })
           .join("");
+        const groupAWinner = settings.championsGroups.A?.[0] || "Grup A Galibi";
+        const groupBWinner = settings.championsGroups.B?.[0] || "Grup B Galibi";
+        elements.championsFinalPath.innerHTML = `
+          <div class="winner-card">
+            <div class="winner-label">Grup A Galibi</div>
+            <div class="club">
+              ${logoMarkup(groupAWinner)}
+              <span>${escapeHtml(groupAWinner)}</span>
+            </div>
+          </div>
+          <div class="final-center">FİNAL</div>
+          <div class="winner-card">
+            <div class="winner-label">Grup B Galibi</div>
+            <div class="club">
+              ${logoMarkup(groupBWinner)}
+              <span>${escapeHtml(groupBWinner)}</span>
+            </div>
+          </div>
+        `;
       }
 
       function renderStats() {

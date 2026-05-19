@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -2733,12 +2733,6 @@
           .map((team, index) => {
             const realIndex = state.teams.findIndex((item) => item.team === team.team);
             const qualificationClass = index < 3 ? "qualification-champions" : index < 5 ? "qualification-playoff" : "";
-            const qualificationBadge =
-              index < 3
-                ? `<span class="qualification-badge champions">Şampuanlar Ligi</span>`
-                : index < 5
-                  ? `<span class="qualification-badge playoff">Ön Eleme</span>`
-                  : "";
             return `
               <tr class="${qualificationClass}">
                 <td class="rank">${index + 1}</td>
@@ -2756,7 +2750,7 @@
                 <td>${Number(team.goalsAgainst) || 0}</td>
                 <td class="form">${goalDifference(team)}</td>
                 <td class="points">${Number(team.points) || 0}</td>
-                <td class="form">${qualificationBadge || escapeHtml(team.form || "-----")}</td>
+                <td class="form">${escapeHtml(team.form || "-----")}</td>
                 <td>
                   ${
                     state.isAdmin

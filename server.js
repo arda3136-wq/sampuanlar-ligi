@@ -54,8 +54,10 @@ const defaultState = {
   leagueSettings: {
     leagueName: "LOS PESİCOS",
     leagueLogo: "",
+    leagueTrophy: "",
     championsName: "ŞAMPUANLAR LİGİ",
     championsLogo: "",
+    championsTrophy: "",
     championsGroups: {
       A: ["AC MÄ°LAN", "GALATASARAY"],
       B: ["ARSENAL", "FENERBAHÃ‡E"]

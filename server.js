@@ -51,6 +51,16 @@ const defaultState = {
     startDate: "2026-05-17",
     endDate: "2026-06-30"
   },
+  leagueSettings: {
+    leagueName: "LOS PESİCOS",
+    leagueLogo: "",
+    championsName: "ŞAMPUANLAR LİGİ",
+    championsLogo: "",
+    championsGroups: {
+      A: ["AC MÄ°LAN", "GALATASARAY"],
+      B: ["ARSENAL", "FENERBAHÃ‡E"]
+    }
+  },
   fixturePoster: {
     matchIndex: 0,
     home: "AC MİLAN",
@@ -104,6 +114,10 @@ function normalizeState(input = {}) {
       ...defaultState.season,
       ...(input.season && typeof input.season === "object" ? input.season : {})
     },
+    leagueSettings: {
+      ...defaultState.leagueSettings,
+      ...(input.leagueSettings && typeof input.leagueSettings === "object" ? input.leagueSettings : {})
+    },
     fixturePoster: {
       ...defaultState.fixturePoster,
       ...(input.fixturePoster && typeof input.fixturePoster === "object" ? input.fixturePoster : {})
@@ -135,7 +149,16 @@ function migrateLegacyTeamNames(state) {
         key,
         Array.isArray(rows) ? rows.map((row) => ({ ...row, team: rename(row.team) })) : rows
       ])
-    )
+    ),
+    leagueSettings: {
+      ...state.leagueSettings,
+      championsGroups: Object.fromEntries(
+        Object.entries(state.leagueSettings.championsGroups || {}).map(([group, teams]) => [
+          group,
+          Array.isArray(teams) ? teams.map(rename) : teams
+        ])
+      )
+    }
   };
 }
 

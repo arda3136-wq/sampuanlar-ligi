@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -811,6 +811,59 @@
         font-weight: 1000;
       }
 
+      .trophy-showcase {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: minmax(180px, 0.42fr) 1fr;
+        align-items: center;
+        gap: 18px;
+        margin-top: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 20px;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.055)),
+          radial-gradient(circle at 18% 18%, rgba(255, 209, 102, 0.16), transparent 16rem);
+        padding: 18px;
+      }
+
+      .trophy-visual {
+        display: grid;
+        width: min(100%, 220px);
+        aspect-ratio: 1 / 1;
+        place-items: center;
+        justify-self: center;
+        border-radius: 24px;
+        background:
+          linear-gradient(135deg, rgba(255, 209, 102, 0.2), rgba(126, 231, 200, 0.14)),
+          rgba(8, 31, 42, 0.42);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 54px;
+        font-weight: 1000;
+        overflow: hidden;
+      }
+
+      .trophy-visual img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 12px;
+      }
+
+      .trophy-copy h4 {
+        color: white;
+        font-size: clamp(24px, 3vw, 34px);
+        font-weight: 1000;
+        margin-bottom: 8px;
+      }
+
+      .trophy-copy p {
+        color: rgba(255, 255, 255, 0.64);
+        line-height: 1.55;
+        font-weight: 800;
+      }
+
       table {
         width: 100%;
         min-width: 680px;
@@ -1490,7 +1543,8 @@
 
         .score-row,
         .fixture,
-        .final-path {
+        .final-path,
+        .trophy-showcase {
           grid-template-columns: 1fr;
         }
 
@@ -1640,6 +1694,7 @@
                 <div id="championshipOddsPanel" class="odds-list"></div>
               </aside>
             </div>
+            <div id="leagueTrophyShowcase" class="trophy-showcase"></div>
           </div>
         </section>
 
@@ -1670,6 +1725,7 @@
             </div>
             <div id="championsGroupsGrid" class="group-grid"></div>
             <div id="championsFinalPath" class="final-path"></div>
+            <div id="championsTrophyShowcase" class="trophy-showcase"></div>
           </div>
         </section>
 
@@ -1836,8 +1892,10 @@
       const defaultLeagueSettings = {
         leagueName: "LOS PESİCOS",
         leagueLogo: "",
+        leagueTrophy: "",
         championsName: "ŞAMPUANLAR LİGİ",
         championsLogo: "",
+        championsTrophy: "",
         championsGroups: {
           A: ["AC MİLAN", "GALATASARAY"],
           B: ["ARSENAL", "FENERBAHÇE"]
@@ -1882,6 +1940,8 @@
         championsLeagueTitle: document.getElementById("championsLeagueTitle"),
         championsGroupsGrid: document.getElementById("championsGroupsGrid"),
         championsFinalPath: document.getElementById("championsFinalPath"),
+        leagueTrophyShowcase: document.getElementById("leagueTrophyShowcase"),
+        championsTrophyShowcase: document.getElementById("championsTrophyShowcase"),
         addMatchButton: document.getElementById("addMatchButton"),
         addTransferButton: document.getElementById("addTransferButton"),
         addNewsButton: document.getElementById("addNewsButton"),
@@ -2223,6 +2283,7 @@
         renderTeamOwner();
         renderNews();
         renderStandings();
+        renderLeagueTrophy();
         renderChampionAndSummary();
         renderMatches();
         renderChampionsLeague();
@@ -2933,6 +2994,23 @@
           .join("");
       }
 
+      function trophyMarkup(src, fallback) {
+        return src
+          ? `<div class="trophy-visual"><img src="${escapeHtml(src)}" alt="${escapeHtml(fallback)} kupa"></div>`
+          : `<div class="trophy-visual">${escapeHtml(initials(fallback))}</div>`;
+      }
+
+      function renderLeagueTrophy() {
+        const settings = normalizeLeagueSettings(state.leagueSettings);
+        elements.leagueTrophyShowcase.innerHTML = `
+          ${trophyMarkup(settings.leagueTrophy, settings.leagueName)}
+          <div class="trophy-copy">
+            <h4>${escapeHtml(settings.leagueName)} Kupası</h4>
+            <p>Normal lig şampiyonunun kaldıracağı kupa alanı. Admin bu bölüme kendi kupa görselini ekleyebilir.</p>
+          </div>
+        `;
+      }
+
       function renderMatches() {
         if (!state.matches.length) {
           elements.matchesGrid.innerHTML = `<div class="empty">Henüz maç eklenmedi.</div>`;
@@ -3030,6 +3108,13 @@
               ${logoMarkup(groupBWinner)}
               <span>${escapeHtml(groupBWinner)}</span>
             </div>
+          </div>
+        `;
+        elements.championsTrophyShowcase.innerHTML = `
+          ${trophyMarkup(settings.championsTrophy, settings.championsName)}
+          <div class="trophy-copy">
+            <h4>${escapeHtml(settings.championsName)} Kupası</h4>
+            <p>Finali kazanan takımın kaldıracağı özel kupa alanı. Admin buraya turnuva kupasının görselini ekleyebilir.</p>
           </div>
         `;
       }
@@ -3240,13 +3325,15 @@
           "Lig Ayarları",
           [
             { name: "leagueName", label: "Normal lig adı", value: settings.leagueName, required: true },
-            { name: "leagueLogo", label: "Normal lig logo adresi", value: settings.leagueLogo || "" }
+            { name: "leagueLogo", label: "Normal lig logo adresi", value: settings.leagueLogo || "" },
+            { name: "leagueTrophy", label: "Normal lig kupa görsel adresi", value: settings.leagueTrophy || "" }
           ],
-          async ({ leagueName, leagueLogo }) => {
+          async ({ leagueName, leagueLogo, leagueTrophy }) => {
             state.leagueSettings = normalizeLeagueSettings({
               ...settings,
               leagueName: leagueName.trim() || "LOS PESİCOS",
-              leagueLogo: leagueLogo.trim()
+              leagueLogo: leagueLogo.trim(),
+              leagueTrophy: leagueTrophy.trim()
             });
             await commitChanges("Lig ayarları güncellendi.");
           }
@@ -3261,14 +3348,16 @@
           [
             { name: "championsName", label: "Turnuva adı", value: settings.championsName, required: true },
             { name: "championsLogo", label: "Turnuva logo adresi", value: settings.championsLogo || "" },
+            { name: "championsTrophy", label: "Turnuva kupa görsel adresi", value: settings.championsTrophy || "" },
             { name: "groupA", label: "Grup A takımları (virgülle 2 takım)", value: settings.championsGroups.A.join(", "), required: true },
             { name: "groupB", label: "Grup B takımları (virgülle 2 takım)", value: settings.championsGroups.B.join(", "), required: true }
           ],
-          async ({ championsName, championsLogo, groupA, groupB }) => {
+          async ({ championsName, championsLogo, championsTrophy, groupA, groupB }) => {
             state.leagueSettings = normalizeLeagueSettings({
               ...settings,
               championsName: championsName.trim() || "ŞAMPUANLAR LİGİ",
               championsLogo: championsLogo.trim(),
+              championsTrophy: championsTrophy.trim(),
               championsGroups: {
                 A: parseGroupTeams(groupA),
                 B: parseGroupTeams(groupB)

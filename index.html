@@ -1,9 +1,9 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Şampuanlar Ligi</title>
+    <title>LOS PESİCOS</title>
     <style>
       :root {
         --bg: #0b0d12;
@@ -103,6 +103,13 @@
         font-size: 20px;
         font-weight: 1000;
         box-shadow: 0 16px 42px rgba(244, 201, 93, 0.22);
+        overflow: hidden;
+      }
+
+      .brand-mark img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
 
       h1,
@@ -530,6 +537,64 @@
         font-weight: 1000;
       }
 
+      .league-stage-head {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .league-stage-logo {
+        display: grid;
+        width: 58px;
+        height: 58px;
+        flex: 0 0 58px;
+        place-items: center;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #f4c95d, #e23b4a);
+        color: var(--black);
+        font-weight: 1000;
+        overflow: hidden;
+      }
+
+      .league-stage-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .group-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .group-card {
+        border-radius: 18px;
+        padding: 22px;
+      }
+
+      .group-card h4 {
+        color: var(--green);
+        font-size: 24px;
+        font-weight: 1000;
+        margin-bottom: 16px;
+      }
+
+      .group-team-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .group-team {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.07);
+        padding: 12px;
+      }
+
       table {
         width: 100%;
         min-width: 680px;
@@ -553,6 +618,35 @@
 
       tr:last-child td {
         border-bottom: 0;
+      }
+
+      .qualification-champions td {
+        background: rgba(244, 201, 93, 0.11);
+      }
+
+      .qualification-playoff td {
+        background: rgba(57, 255, 136, 0.075);
+      }
+
+      .qualification-badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 5px 9px;
+        font-size: 11px;
+        font-weight: 1000;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .qualification-badge.champions {
+        background: rgba(244, 201, 93, 0.18);
+        color: #f4c95d;
+      }
+
+      .qualification-badge.playoff {
+        background: rgba(57, 255, 136, 0.13);
+        color: var(--green);
       }
 
       .rank {
@@ -1105,6 +1199,7 @@
       @media (max-width: 820px) {
         .hero-grid,
         .standings-layout,
+        .group-grid,
         .transfer-grid,
         .stats-grid,
         .news-grid,
@@ -1196,14 +1291,15 @@
       <header class="header">
         <div class="container header-inner">
           <div class="brand">
-            <div class="brand-mark">FL</div>
+            <div id="leagueBrandLogo" class="brand-mark">LP</div>
             <div>
-              <h1>ŞAMPUANLAR LİGİ</h1>
+              <h1 id="leagueBrandName">LOS PESİCOS</h1>
               <p class="subtitle">Profesyonel Lig Sistemi</p>
             </div>
           </div>
           <div class="header-actions">
             <button id="teamLoginButton" class="button secondary">Takım Girişi</button>
+            <button id="leagueSettingsButton" class="button secondary" style="display: none;">Lig Ayarları</button>
             <button id="adminButton" class="button">Admin Girişi</button>
           </div>
         </div>
@@ -1313,7 +1409,23 @@
           </div>
         </section>
 
-        <section class="section">
+        <section id="championsLeagueSection" class="section">
+          <div class="container">
+            <div class="section-head">
+              <div class="league-stage-head">
+                <div id="championsLeagueLogo" class="league-stage-logo">ŞL</div>
+                <div>
+                  <h3 id="championsLeagueTitle">ŞAMPUANLAR LİGİ</h3>
+                  <p>Grup aşaması</p>
+                </div>
+              </div>
+              <button id="championsSettingsButton" class="button" style="display: none;">Grupları Düzenle</button>
+            </div>
+            <div id="championsGroupsGrid" class="group-grid"></div>
+          </div>
+        </section>
+
+        <section class="section" hidden>
           <div class="container">
             <div class="section-head">
               <div>
@@ -1473,6 +1585,17 @@
         endDate: "2026-06-30"
       };
 
+      const defaultLeagueSettings = {
+        leagueName: "LOS PESİCOS",
+        leagueLogo: "",
+        championsName: "ŞAMPUANLAR LİGİ",
+        championsLogo: "",
+        championsGroups: {
+          A: ["AC MİLAN", "GALATASARAY"],
+          B: ["ARSENAL", "FENERBAHÇE"]
+        }
+      };
+
       const defaultFixturePoster = {
         matchIndex: 0,
         home: "AC MİLAN",
@@ -1494,6 +1617,7 @@
         stats: load("league_stats", defaultStats),
         transfers: load("league_transfers", []),
         season: load("league_season", defaultSeason),
+        leagueSettings: load("league_settings", defaultLeagueSettings),
         fixturePoster: load("league_fixture_poster", defaultFixturePoster),
         teamOwner: sessionStorage.getItem("league_team_owner") || "",
         isAdmin: Boolean(sessionStorage.getItem("league_admin_token"))
@@ -1502,6 +1626,13 @@
       const elements = {
         adminButton: document.getElementById("adminButton"),
         teamLoginButton: document.getElementById("teamLoginButton"),
+        leagueSettingsButton: document.getElementById("leagueSettingsButton"),
+        leagueBrandLogo: document.getElementById("leagueBrandLogo"),
+        leagueBrandName: document.getElementById("leagueBrandName"),
+        championsSettingsButton: document.getElementById("championsSettingsButton"),
+        championsLeagueLogo: document.getElementById("championsLeagueLogo"),
+        championsLeagueTitle: document.getElementById("championsLeagueTitle"),
+        championsGroupsGrid: document.getElementById("championsGroupsGrid"),
         addMatchButton: document.getElementById("addMatchButton"),
         addTransferButton: document.getElementById("addTransferButton"),
         addNewsButton: document.getElementById("addNewsButton"),
@@ -1564,6 +1695,7 @@
           stats: state.stats,
           transfers: state.transfers,
           season: state.season,
+          leagueSettings: state.leagueSettings,
           fixturePoster: state.fixturePoster
         };
       }
@@ -1591,6 +1723,7 @@
           state.stats = { ...defaultStats, ...(data.stats || {}) };
           state.transfers = data.transfers || state.transfers;
           state.season = { ...defaultSeason, ...(data.season || {}) };
+          state.leagueSettings = normalizeLeagueSettings(data.leagueSettings || state.leagueSettings);
           state.fixturePoster = { ...defaultFixturePoster, ...(data.fixturePoster || {}) };
           ensureTeamLogos();
         } catch (error) {
@@ -1612,6 +1745,7 @@
         state.stats = { ...defaultStats, ...(data.stats || state.stats) };
         state.transfers = data.transfers || state.transfers;
         state.season = { ...defaultSeason, ...(data.season || state.season) };
+        state.leagueSettings = normalizeLeagueSettings(data.leagueSettings || state.leagueSettings);
         state.fixturePoster = { ...defaultFixturePoster, ...(data.fixturePoster || state.fixturePoster) };
       }
 
@@ -1700,6 +1834,30 @@
         };
       }
 
+      function normalizeLeagueSettings(settings = {}) {
+        const groups = settings.championsGroups || {};
+        return {
+          ...defaultLeagueSettings,
+          ...settings,
+          leagueName: settings.leagueName || "LOS PESİCOS",
+          championsName: settings.championsName || "ŞAMPUANLAR LİGİ",
+          championsGroups: {
+            A: Array.isArray(groups.A) ? groups.A.slice(0, 2) : defaultLeagueSettings.championsGroups.A,
+            B: Array.isArray(groups.B) ? groups.B.slice(0, 2) : defaultLeagueSettings.championsGroups.B
+          }
+        };
+      }
+
+      function parseGroupTeams(value) {
+        const teams = String(value || "")
+          .split(",")
+          .map((team) => team.trim())
+          .filter(Boolean)
+          .slice(0, 2);
+        while (teams.length < 2) teams.push(defaultTeams[teams.length]?.team || "Takım");
+        return teams;
+      }
+
       function matchStatus(match, index = -1) {
         if (match.status === "live" || index === state.liveMatchIndex) return { key: "live", label: "Canlı" };
         if (match.status === "finished") return { key: "finished", label: "Bitti" };
@@ -1752,6 +1910,7 @@
         save("league_teams", state.teams);
         state.stats = { ...defaultStats, ...state.stats };
         state.season = { ...defaultSeason, ...state.season };
+        state.leagueSettings = normalizeLeagueSettings(state.leagueSettings);
         state.fixturePoster = { ...defaultFixturePoster, ...state.fixturePoster };
       }
 
@@ -1806,15 +1965,16 @@
       }
 
       function render() {
+        renderLeagueIdentity();
         renderAdminState();
         renderLiveMatch();
         renderSeason();
         renderTeamOwner();
         renderNews();
-        renderFixturePosterTool();
         renderStandings();
         renderChampionAndSummary();
         renderMatches();
+        renderChampionsLeague();
         renderStats();
         renderTransfers();
       }
@@ -1824,9 +1984,26 @@
         elements.adminButton.className = state.isAdmin ? "button danger" : "button";
         elements.teamLoginButton.textContent = state.teamOwner ? `${state.teamOwner} Çıkış` : "Takım Girişi";
         elements.teamLoginButton.className = state.teamOwner ? "button danger" : "button secondary";
+        elements.leagueSettingsButton.style.display = state.isAdmin ? "inline-flex" : "none";
+        elements.championsSettingsButton.style.display = state.isAdmin ? "inline-flex" : "none";
         elements.addMatchButton.style.display = state.isAdmin ? "inline-flex" : "none";
         elements.addTransferButton.style.display = state.isAdmin ? "inline-flex" : "none";
         elements.addNewsButton.style.display = state.isAdmin ? "inline-flex" : "none";
+      }
+
+      function logoBox(element, text, logo) {
+        if (!element) return;
+        element.innerHTML = logo
+          ? `<img src="${escapeHtml(logo)}" alt="${escapeHtml(text)} logo">`
+          : escapeHtml(initials(text));
+      }
+
+      function renderLeagueIdentity() {
+        const settings = normalizeLeagueSettings(state.leagueSettings);
+        elements.leagueBrandName.textContent = settings.leagueName;
+        logoBox(elements.leagueBrandLogo, settings.leagueName, settings.leagueLogo);
+        elements.championsLeagueTitle.textContent = settings.championsName;
+        logoBox(elements.championsLeagueLogo, settings.championsName, settings.championsLogo);
       }
 
       function renderLiveMatch() {
@@ -2011,7 +2188,7 @@
           ctx.fillStyle = "rgba(255,255,255,0.08)";
           roundRect(ctx, 72, 72, 936, 560, 42);
           ctx.fill();
-          drawCenteredText(ctx, "ŞAMPUANLAR LİGİ", 540, 352, 720, 54, "#f4c95d");
+          drawCenteredText(ctx, normalizeLeagueSettings(state.leagueSettings).leagueName, 540, 352, 720, 54, "#f4c95d");
         }
 
         ctx.fillStyle = "rgba(0,0,0,0.76)";
@@ -2024,7 +2201,7 @@
         ctx.fillStyle = "#f4c95d";
         ctx.font = "900 30px Arial";
         ctx.textAlign = "left";
-        ctx.fillText("ŞAMPUANLAR LİGİ HABER", 120, 634);
+        ctx.fillText(`${normalizeLeagueSettings(state.leagueSettings).leagueName} HABER`, 120, 634);
 
         ctx.fillStyle = "#ffffff";
         ctx.font = "1000 58px Arial";
@@ -2399,7 +2576,7 @@
                 <div class="champion-cup">1</div>
                 <div>
                   <h3>${escapeHtml(champion.team)} Şampiyon Oldu!</h3>
-                  <p>Şampuanlar Ligi sezonu tamamlandı. Puan durumu lideri konfetiyle sahnede.</p>
+                  <p>${escapeHtml(normalizeLeagueSettings(state.leagueSettings).leagueName)} sezonu tamamlandı. Puan durumu lideri konfetiyle sahnede.</p>
                 </div>
               </div>
             </div>
@@ -2437,8 +2614,15 @@
         elements.standingsBody.innerHTML = sorted
           .map((team, index) => {
             const realIndex = state.teams.findIndex((item) => item.team === team.team);
+            const qualificationClass = index < 3 ? "qualification-champions" : index < 5 ? "qualification-playoff" : "";
+            const qualificationBadge =
+              index < 3
+                ? `<span class="qualification-badge champions">Şampuanlar Ligi</span>`
+                : index < 5
+                  ? `<span class="qualification-badge playoff">Ön Eleme</span>`
+                  : "";
             return `
-              <tr>
+              <tr class="${qualificationClass}">
                 <td class="rank">${index + 1}</td>
                 <td>
                   <div class="club">
@@ -2454,7 +2638,7 @@
                 <td>${Number(team.goalsAgainst) || 0}</td>
                 <td class="form">${goalDifference(team)}</td>
                 <td class="points">${Number(team.points) || 0}</td>
-                <td class="form">${escapeHtml(team.form || "-----")}</td>
+                <td class="form">${qualificationBadge || escapeHtml(team.form || "-----")}</td>
                 <td>
                   ${
                     state.isAdmin
@@ -2531,6 +2715,34 @@
           `;
             }
           )
+          .join("");
+      }
+
+      function renderChampionsLeague() {
+        const settings = normalizeLeagueSettings(state.leagueSettings);
+        elements.championsGroupsGrid.innerHTML = Object.entries(settings.championsGroups)
+          .map(([groupName, teams]) => {
+            const rows = teams
+              .map((teamName, index) => {
+                const team = getTeamByName(teamName) || { team: teamName };
+                return `
+                  <div class="group-team">
+                    <div class="club">
+                      ${logoMarkup(team.team)}
+                      <span>${escapeHtml(team.team)}</span>
+                    </div>
+                    <strong>${index + 1}</strong>
+                  </div>
+                `;
+              })
+              .join("");
+            return `
+              <article class="panel group-card">
+                <h4>Grup ${escapeHtml(groupName)}</h4>
+                <div class="group-team-list">${rows}</div>
+              </article>
+            `;
+          })
           .join("");
       }
 
@@ -2722,6 +2934,52 @@
               showToast(error.message || "Takım girişi başarısız.");
               return false;
             }
+          }
+        );
+      });
+
+      elements.leagueSettingsButton.addEventListener("click", () => {
+        if (!state.isAdmin) return;
+        const settings = normalizeLeagueSettings(state.leagueSettings);
+        openEditor(
+          "Lig Ayarları",
+          [
+            { name: "leagueName", label: "Normal lig adı", value: settings.leagueName, required: true },
+            { name: "leagueLogo", label: "Normal lig logo adresi", value: settings.leagueLogo || "" }
+          ],
+          async ({ leagueName, leagueLogo }) => {
+            state.leagueSettings = normalizeLeagueSettings({
+              ...settings,
+              leagueName: leagueName.trim() || "LOS PESİCOS",
+              leagueLogo: leagueLogo.trim()
+            });
+            await commitChanges("Lig ayarları güncellendi.");
+          }
+        );
+      });
+
+      elements.championsSettingsButton.addEventListener("click", () => {
+        if (!state.isAdmin) return;
+        const settings = normalizeLeagueSettings(state.leagueSettings);
+        openEditor(
+          "Şampuanlar Ligi Ayarları",
+          [
+            { name: "championsName", label: "Turnuva adı", value: settings.championsName, required: true },
+            { name: "championsLogo", label: "Turnuva logo adresi", value: settings.championsLogo || "" },
+            { name: "groupA", label: "Grup A takımları (virgülle 2 takım)", value: settings.championsGroups.A.join(", "), required: true },
+            { name: "groupB", label: "Grup B takımları (virgülle 2 takım)", value: settings.championsGroups.B.join(", "), required: true }
+          ],
+          async ({ championsName, championsLogo, groupA, groupB }) => {
+            state.leagueSettings = normalizeLeagueSettings({
+              ...settings,
+              championsName: championsName.trim() || "ŞAMPUANLAR LİGİ",
+              championsLogo: championsLogo.trim(),
+              championsGroups: {
+                A: parseGroupTeams(groupA),
+                B: parseGroupTeams(groupB)
+              }
+            });
+            await commitChanges("Şampuanlar Ligi güncellendi.");
           }
         );
       });

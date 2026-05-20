@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -1243,6 +1243,55 @@
         padding: 22px;
       }
 
+      .team-welcome {
+        position: relative;
+        overflow: hidden;
+        border-radius: 18px;
+        margin-bottom: 18px;
+        padding: clamp(20px, 4vw, 30px);
+        background:
+          linear-gradient(135deg, rgba(126, 231, 200, 0.18), rgba(255, 209, 102, 0.11)),
+          rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(126, 231, 200, 0.22);
+      }
+
+      .team-welcome::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.13), transparent),
+          repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 9px);
+        opacity: 0.55;
+      }
+
+      .team-welcome h3,
+      .team-welcome p {
+        position: relative;
+        z-index: 1;
+      }
+
+      .team-welcome h3 {
+        color: white;
+        font-size: clamp(30px, 5vw, 54px);
+        font-weight: 1000;
+        line-height: 0.98;
+      }
+
+      .team-welcome p {
+        margin-top: 10px;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 900;
+      }
+
+      .team-welcome.euro {
+        border-color: rgba(255, 209, 102, 0.32);
+        background:
+          linear-gradient(135deg, rgba(255, 209, 102, 0.24), rgba(143, 200, 255, 0.15)),
+          rgba(255, 255, 255, 0.08);
+      }
+
       .team-owner-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1963,6 +2012,7 @@
         championsName: "ŞAMPUANLAR LİGİ",
         championsLogo: "",
         championsTrophy: "",
+        championsWinner: "",
         championsGroups: {
           A: ["AC MİLAN", "GALATASARAY"],
           B: ["ARSENAL", "FENERBAHÇE"]
@@ -2435,13 +2485,21 @@
         }
         const teamMatches = state.matches.filter((match) => match.home === team.team || match.away === team.team);
         const teamTransfers = state.transfers.filter((transfer) => transfer.from === team.team || transfer.to === team.team);
+        const settings = normalizeLeagueSettings(state.leagueSettings);
+        const leagueChampion = sortTeams(state.teams)[0]?.team;
+        const isEuroChampion = settings.championsWinner && settings.championsWinner === team.team;
+        const isLeagueChampion = leagueChampion === team.team;
+        const welcomeTitle = isEuroChampion ? "HOŞ GELDİN AVRUPA ŞAMPUANI" : isLeagueChampion ? "HOŞ GELDİN ŞAMPİYON" : `HOŞ GELDİN ${team.team}`;
+        const welcomeText = isEuroChampion
+          ? `${settings.championsName} final galibi takım paneline giriş yaptı.`
+          : isLeagueChampion
+            ? `${settings.leagueName} lideri takım paneline giriş yaptı.`
+            : "Takımına ait bilgileri hızlıca görebilirsin.";
         elements.teamOwnerSection.style.display = "block";
         elements.teamOwnerPanel.innerHTML = `
-          <div class="section-head">
-            <div>
-              <h3>${escapeHtml(team.team)} Takım Paneli</h3>
-              <p>Admin yetkisi olmadan takımına ait bilgileri hızlıca görürsün.</p>
-            </div>
+          <div class="team-welcome ${isEuroChampion ? "euro" : ""}">
+            <h3>${escapeHtml(welcomeTitle)}</h3>
+            <p>${escapeHtml(welcomeText)}</p>
           </div>
           <div class="team-owner-grid">
             <div class="team-owner-stat"><span>Puan</span><strong>${Number(team.points) || 0}</strong></div>
@@ -3416,15 +3474,17 @@
             { name: "championsName", label: "Turnuva adı", value: settings.championsName, required: true },
             { name: "championsLogo", label: "Turnuva logo adresi", value: settings.championsLogo || "" },
             { name: "championsTrophy", label: "Turnuva kupa görsel adresi", value: settings.championsTrophy || "" },
+            { name: "championsWinner", label: "Şampuanlar Ligi final galibi takım", value: settings.championsWinner || "" },
             { name: "groupA", label: "Grup A takımları (virgülle 2 takım)", value: settings.championsGroups.A.join(", "), required: true },
             { name: "groupB", label: "Grup B takımları (virgülle 2 takım)", value: settings.championsGroups.B.join(", "), required: true }
           ],
-          async ({ championsName, championsLogo, championsTrophy, groupA, groupB }) => {
+          async ({ championsName, championsLogo, championsTrophy, championsWinner, groupA, groupB }) => {
             state.leagueSettings = normalizeLeagueSettings({
               ...settings,
               championsName: championsName.trim() || "ŞAMPUANLAR LİGİ",
               championsLogo: championsLogo.trim(),
               championsTrophy: championsTrophy.trim(),
+              championsWinner: championsWinner.trim(),
               championsGroups: {
                 A: parseGroupTeams(groupA),
                 B: parseGroupTeams(groupB)

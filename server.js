@@ -58,6 +58,7 @@ const defaultState = {
     championsName: "ŞAMPUANLAR LİGİ",
     championsLogo: "",
     championsTrophy: "",
+    championsWinner: "",
     championsGroups: {
       A: ["AC MÄ°LAN", "GALATASARAY"],
       B: ["ARSENAL", "FENERBAHÃ‡E"]

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -1975,7 +1975,12 @@
         { team: "GALATASARAY", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("GS", "#f4c95d", "#b21f2d") },
         { team: "ARSENAL", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("ARS", "#ef233c", "#f6f6f6") },
         { team: "FENERBAHÇE", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("FB", "#ffe033", "#123c8c") },
-        { team: "İNTER NAZİONALE MİLAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("INT", "#1d4ed8", "#0f172a") }
+        { team: "İNTER NAZİONALE MİLAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("INT", "#1d4ed8", "#0f172a") },
+        { team: "TAKIM 6", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("T6", "#0f766e", "#7ee7c8") },
+        { team: "TAKIM 7", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("T7", "#1d4ed8", "#8fc8ff") },
+        { team: "TAKIM 8", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("T8", "#7c3aed", "#c4b5fd") },
+        { team: "TAKIM 9", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("T9", "#be123c", "#fb7185") },
+        { team: "TAKIM 10", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("T10", "#ca8a04", "#fde68a") }
       ];
 
       const defaultMatches = [
@@ -2223,6 +2228,14 @@
         }));
       }
 
+      function ensureTeamCapacity() {
+        defaultTeams.forEach((defaultTeam) => {
+          if (state.teams.length >= 10) return;
+          const alreadyExists = state.teams.some((team) => team.team === defaultTeam.team);
+          if (!alreadyExists) state.teams.push(structuredClone(defaultTeam));
+        });
+      }
+
       function logoMarkup(teamName, className = "club-logo") {
         const team = getTeamByName(teamName) || { team: teamName, logo: "" };
         if (team.logo) {
@@ -2330,6 +2343,7 @@
           save("league_stats", state.stats);
         }
         state.teams = state.teams.map(normalizeTeam);
+        ensureTeamCapacity();
         state.matches = state.matches.map(normalizeMatch);
         state.news = Array.isArray(state.news) ? state.news : defaultNews;
         state.liveMatchIndex = Number.isInteger(state.liveMatchIndex) ? state.liveMatchIndex : 0;
@@ -3736,42 +3750,4 @@
       });
 
       function openStatEditor(statKey, index = null) {
-        const row = index === null ? { player: "", team: state.teams[0]?.team || "", value: 0 } : state.stats[statKey][index];
-        const titles = {
-          goals: "Gol kaydı",
-          redCards: "Kırmızı kart kaydı",
-          yellowCards: "Sarı kart kaydı"
-        };
-        openEditor(
-          titles[statKey] || "Oyuncu kaydı",
-          [
-            { name: "player", label: "Oyuncu adı", value: row.player, required: true },
-            { name: "team", label: "Takım", value: row.team, required: true },
-            { name: "value", label: "Sayı", type: "number", value: row.value, required: true }
-          ],
-          async ({ player, team, value }) => {
-            const nextRow = { player: player.trim(), team: team.trim(), value: Number(value) };
-            if (index === null) {
-              state.stats[statKey].push(nextRow);
-            } else {
-              state.stats[statKey][index] = nextRow;
-            }
-            await commitChanges("Oyuncu istatistiği güncellendi.");
-          }
-        );
-      }
-
-      async function initialize() {
-        await loadServerState();
-        applyRequestedDefaults();
-        renameLegacyTeams();
-        render();
-      }
-
-      initialize();
-    </script>
-  </body>
-</html>
-
-
-
+        const row = index === null ? { player: "",

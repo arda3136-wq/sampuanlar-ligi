@@ -16,15 +16,20 @@ const TOKEN_MAX_AGE_MS = 12 * 60 * 60 * 1000;
 
 const defaultState = {
   teams: [
-    { team: "AC MİLAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
+    { team: "AC MÄ°LAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
     { team: "GALATASARAY", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
     { team: "ARSENAL", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
-    { team: "FENERBAHÇE", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
-    { team: "İNTER NAZİONALE MİLAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" }
+    { team: "FENERBAHÃ‡E", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
+    { team: "Ä°NTER NAZÄ°ONALE MÄ°LAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
+    { team: "TAKIM 6", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
+    { team: "TAKIM 7", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
+    { team: "TAKIM 8", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
+    { team: "TAKIM 9", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
+    { team: "TAKIM 10", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" }
   ],
   matches: [
-    { home: "AC MİLAN", away: "GALATASARAY", score: "VS", stadium: "League Arena", time: "20:00" },
-    { home: "ARSENAL", away: "FENERBAHÇE", score: "VS", stadium: "Champions Stadium", time: "18:30" }
+    { home: "AC MÄ°LAN", away: "GALATASARAY", score: "VS", stadium: "League Arena", time: "20:00" },
+    { home: "ARSENAL", away: "FENERBAHÃ‡E", score: "VS", stadium: "Champions Stadium", time: "18:30" }
   ],
   liveMatchIndex: 0,
   news: [],
@@ -34,15 +39,15 @@ const defaultState = {
       { player: "Bukayo Saka", team: "ARSENAL", value: 0 }
     ],
     assists: [
-      { player: "Dusan Tadic", team: "FENERBAHÇE", value: 0 },
+      { player: "Dusan Tadic", team: "FENERBAHÃ‡E", value: 0 },
       { player: "Martin Odegaard", team: "ARSENAL", value: 0 }
     ],
     redCards: [
-      { player: "Oyuncu 1", team: "AC MİLAN", value: 0 },
-      { player: "Oyuncu 2", team: "İNTER NAZİONALE MİLAN", value: 0 }
+      { player: "Oyuncu 1", team: "AC MÄ°LAN", value: 0 },
+      { player: "Oyuncu 2", team: "Ä°NTER NAZÄ°ONALE MÄ°LAN", value: 0 }
     ],
     yellowCards: [
-      { player: "Oyuncu 3", team: "FENERBAHÇE", value: 0 },
+      { player: "Oyuncu 3", team: "FENERBAHÃ‡E", value: 0 },
       { player: "Oyuncu 4", team: "GALATASARAY", value: 0 }
     ]
   },
@@ -52,39 +57,44 @@ const defaultState = {
     endDate: "2026-06-30"
   },
   leagueSettings: {
-    leagueName: "LOS PESİCOS",
+    leagueName: "LOS PESÄ°COS",
     leagueLogo: "",
     leagueTrophy: "",
-    championsName: "ŞAMPUANLAR LİGİ",
+    championsName: "ÅAMPUANLAR LÄ°GÄ°",
     championsLogo: "",
     championsTrophy: "",
     championsWinner: "",
     championsGroups: {
-      A: ["AC MÄ°LAN", "GALATASARAY"],
-      B: ["ARSENAL", "FENERBAHÃ‡E"]
+      A: ["AC MÃ„Â°LAN", "GALATASARAY"],
+      B: ["ARSENAL", "FENERBAHÃƒâ€¡E"]
     }
   },
   fixturePoster: {
     matchIndex: 0,
-    home: "AC MİLAN",
+    home: "AC MÄ°LAN",
     away: "GALATASARAY",
     homeLogo: "",
     awayLogo: "",
     date: "",
     time: "",
     stadium: "",
-    note: "Fikstür",
+    note: "FikstÃ¼r",
     layout: "template"
   }
 };
 
 function parseTeamCodes(raw) {
   const fallback = {
-    "AC MİLAN": "ACMILAN2026",
+    "AC MÄ°LAN": "ACMILAN2026",
     GALATASARAY: "GS2026",
     ARSENAL: "ARS2026",
-    "FENERBAHÇE": "FB2026",
-    "İNTER NAZİONALE MİLAN": "INTER2026"
+    "TAKIM 6": "TAKIM62026",
+    "TAKIM 7": "TAKIM72026",
+    "TAKIM 8": "TAKIM82026",
+    "TAKIM 9": "TAKIM92026",
+    "TAKIM 10": "TAKIM102026",
+    "FENERBAHÃ‡E": "FB2026",
+    "Ä°NTER NAZÄ°ONALE MÄ°LAN": "INTER2026"
   };
   if (!raw) return fallback;
   try {
@@ -130,7 +140,7 @@ function normalizeState(input = {}) {
 
 function migrateLegacyTeamNames(state) {
   const renameMap = {
-    AJAX: "AC MİLAN",
+    AJAX: "AC MÄ°LAN",
     GALATASARAT: "GALATASARAY"
   };
   const rename = (name) => renameMap[name] || name;
@@ -262,13 +272,13 @@ const server = http.createServer(async (request, response) => {
 
     if (request.method === "POST" && url.pathname === "/api/login") {
       if (!ADMIN_USER || !ADMIN_PASS) {
-        return json(response, 500, { message: "Admin bilgileri sunucuda ayarlanmamış." });
+        return json(response, 500, { message: "Admin bilgileri sunucuda ayarlanmamÄ±ÅŸ." });
       }
       const body = await readBody(request);
       if (body.username === ADMIN_USER && body.password === ADMIN_PASS) {
         return json(response, 200, { token: createToken(body.username) });
       }
-      return json(response, 401, { message: "Hatalı giriş bilgisi." });
+      return json(response, 401, { message: "HatalÄ± giriÅŸ bilgisi." });
     }
 
     if (request.method === "POST" && url.pathname === "/api/team-login") {
@@ -278,11 +288,11 @@ const server = http.createServer(async (request, response) => {
       if (TEAM_CODES[team] && TEAM_CODES[team] === code) {
         return json(response, 200, { team });
       }
-      return json(response, 401, { message: "Takım kodu hatalı." });
+      return json(response, 401, { message: "TakÄ±m kodu hatalÄ±." });
     }
 
     if (request.method === "POST" && url.pathname === "/api/state") {
-      if (!verifyToken(request)) return json(response, 401, { message: "Admin girişi gerekli." });
+      if (!verifyToken(request)) return json(response, 401, { message: "Admin giriÅŸi gerekli." });
       const body = await readBody(request);
       await writeState(body);
       return json(response, 200, await readState());
@@ -297,12 +307,13 @@ const server = http.createServer(async (request, response) => {
     }
 
     response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
-    response.end("Bulunamadı");
+    response.end("BulunamadÄ±");
   } catch (error) {
-    json(response, 500, { message: "Sunucu hatası.", detail: error.message });
+    json(response, 500, { message: "Sunucu hatasÄ±.", detail: error.message });
   }
 });
 
 server.listen(PORT, () => {
-  console.log(`Şampuanlar Ligi hazır: http://localhost:${PORT}`);
+  console.log(`Åampuanlar Ligi hazÄ±r: http://localhost:${PORT}`);
 });
+

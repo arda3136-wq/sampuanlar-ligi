@@ -810,6 +810,26 @@
         font-weight: 900;
       }
 
+      .playoff-stage {
+        position: relative;
+        z-index: 1;
+        margin-top: 28px;
+      }
+
+      .playoff-stage .section-head {
+        margin-bottom: 16px;
+      }
+
+      .playoff-winner {
+        position: relative;
+        z-index: 1;
+        margin-top: 18px;
+        border: 1px solid rgba(255, 209, 102, 0.22);
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(255, 209, 102, 0.16), rgba(126, 231, 200, 0.09));
+        padding: 18px;
+      }
+
       #championsLeagueSection {
         position: relative;
       }
@@ -1821,7 +1841,7 @@
                 <p>Lig Tablosu</p>
                 <div class="qualification-legend">
                   <span class="qualification-badge champions">İlk 3: Şampuanlar Ligi</span>
-                  <span class="qualification-badge playoff">4-5: Ön Eleme</span>
+                  <span class="qualification-badge playoff">4-7: Play-Off</span>
                 </div>
               </div>
             </div>
@@ -1884,6 +1904,16 @@
               <button id="championsSettingsButton" class="button" style="display: none;">Grupları Düzenle</button>
             </div>
             <div id="championsGroupsGrid" class="group-grid"></div>
+            <div class="playoff-stage">
+              <div class="section-head">
+                <div>
+                  <h3>Play-Off Grupları</h3>
+                  <p>Normal ligde 4-7 arasındaki takımlar oynar, sadece 1 takım ŞAMPUANLAR LİGİ bileti alır.</p>
+                </div>
+              </div>
+              <div id="championsPlayoffGrid" class="group-grid"></div>
+              <div id="playoffWinnerPanel" class="playoff-winner"></div>
+            </div>
             <div id="championsFinalPath" class="final-path"></div>
             <div id="championsTrophyShowcase" class="trophy-showcase"></div>
           </div>
@@ -2027,6 +2057,8 @@
         { team: "TAKIM 10", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("T10", "#ca8a04", "#fde68a") }
       ];
 
+      const ACTIVE_TEAM_LIMIT = 7;
+
       const defaultMatches = [
         { home: "AC MİLAN", away: "GALATASARAY", score: "VS", stadium: "League Arena", time: "20:00", status: "pending" },
         { home: "ARSENAL", away: "FENERBAHÇE", score: "VS", stadium: "Champions Stadium", time: "18:30", status: "pending" }
@@ -2064,6 +2096,7 @@
         championsLogo: "",
         championsTrophy: "",
         championsWinner: "",
+        playoffWinner: "",
         championsGroups: {
           A: ["AC MİLAN", "GALATASARAY"],
           B: ["ARSENAL", "FENERBAHÇE"]
@@ -2108,6 +2141,8 @@
         championsLeagueLogo: document.getElementById("championsLeagueLogo"),
         championsLeagueTitle: document.getElementById("championsLeagueTitle"),
         championsGroupsGrid: document.getElementById("championsGroupsGrid"),
+        championsPlayoffGrid: document.getElementById("championsPlayoffGrid"),
+        playoffWinnerPanel: document.getElementById("playoffWinnerPanel"),
         championsFinalPath: document.getElementById("championsFinalPath"),
         leagueTrophyShowcase: document.getElementById("leagueTrophyShowcase"),
         championsTrophyShowcase: document.getElementById("championsTrophyShowcase"),
@@ -2273,6 +2308,10 @@
 
       function getTeamByName(name) {
         return state.teams.find((team) => team.team === name);
+      }
+
+      function activeTeams() {
+        return state.teams.slice(0, ACTIVE_TEAM_LIMIT);
       }
 
       function ensureTeamLogos() {
@@ -2558,7 +2597,7 @@
         const teamMatches = state.matches.filter((match) => match.home === team.team || match.away === team.team);
         const teamTransfers = state.transfers.filter((transfer) => transfer.from === team.team || transfer.to === team.team);
         const settings = normalizeLeagueSettings(state.leagueSettings);
-        const leagueChampion = sortTeams(state.teams)[0]?.team;
+        const leagueChampion = sortTeams(activeTeams())[0]?.team;
         const isEuroChampion = settings.championsWinner && settings.championsWinner === team.team;
         const isLeagueChampion = leagueChampion === team.team;
         const welcomeTitle = isEuroChampion ? "HOŞ GELDİN AVRUPA ŞAMPUANI" : isLeagueChampion ? "HOŞ GELDİN ŞAMPİYON" : `HOŞ GELDİN ${team.team}`;
@@ -3048,7 +3087,7 @@
       }
 
       function championshipOdds() {
-        const rows = state.teams.map((team) => {
+        const rows = activeTeams().map((team) => {
           const points = Number(team.points) || 0;
           const wins = Number(team.wins) || 0;
           const losses = Number(team.losses) || 0;
@@ -3168,7 +3207,7 @@
           name: `${settings.leagueName} ${dateLabel(state.season.startDate)} - ${dateLabel(state.season.endDate)}`,
           archivedAt: new Date().toISOString(),
           season: cloneData(state.season),
-          topTeams: sortTeams(state.teams).slice(0, 3).map((team) => ({
+          topTeams: sortTeams(activeTeams()).slice(0, 3).map((team) => ({
             team: team.team,
             points: Number(team.points) || 0,
             played: Number(team.played) || 0,
@@ -3240,7 +3279,7 @@
       async function regenerateFixtures() {
         const ok = confirm("Mevcut fikstür silinip takımlara göre otomatik sezon fikstürü oluşturulsun mu?");
         if (!ok) return;
-        state.matches = generateSeasonFixtures(state.teams, state.season.startDate || todayKey());
+        state.matches = generateSeasonFixtures(activeTeams(), state.season.startDate || todayKey());
         state.liveMatchIndex = 0;
         await commitChanges("Fikstür otomatik oluşturuldu.");
       }
@@ -3256,7 +3295,7 @@
         state.leagueSettings = normalizeLeagueSettings({ ...state.leagueSettings, championsWinner: "" });
         const today = todayKey();
         state.season = { startDate: today, endDate: state.season.endDate && state.season.endDate > today ? state.season.endDate : today };
-        state.matches = generateSeasonFixtures(state.teams, state.season.startDate);
+        state.matches = generateSeasonFixtures(activeTeams(), state.season.startDate);
         await commitChanges("Yeni sezon başlatıldı. Eski sezon arşive kaydedildi.");
       }
 
@@ -3268,7 +3307,7 @@
           return;
         }
 
-        const topTeams = sortTeams(state.teams).slice(0, 3);
+        const topTeams = sortTeams(activeTeams()).slice(0, 3);
         const champion = topTeams[0];
         elements.championPanel.innerHTML = champion
           ? `
@@ -3311,11 +3350,11 @@
       }
 
       function renderStandings() {
-        const sorted = sortTeams(state.teams);
+        const sorted = sortTeams(activeTeams());
         elements.standingsBody.innerHTML = sorted
           .map((team, index) => {
             const realIndex = state.teams.findIndex((item) => item.team === team.team);
-            const qualificationClass = index < 3 ? "qualification-champions" : index < 5 ? "qualification-playoff" : "";
+            const qualificationClass = index < 3 ? "qualification-champions" : index < 7 ? "qualification-playoff" : "";
             return `
               <tr class="${qualificationClass}">
                 <td class="rank">${index + 1}</td>
@@ -3431,6 +3470,34 @@
           .join("");
       }
 
+      function groupCard(title, teams, subtitle, note) {
+        const rows = teams
+          .map((teamName, index) => {
+            const safeName = teamName || "Takım";
+            const team = getTeamByName(safeName) || { team: safeName };
+            return `
+              <div class="group-team">
+                <div class="club">
+                  ${logoMarkup(team.team)}
+                  <span>
+                    ${escapeHtml(team.team)}
+                    <small>${escapeHtml(subtitle)}</small>
+                  </span>
+                </div>
+                <strong>${index + 1}</strong>
+              </div>
+            `;
+          })
+          .join("");
+        return `
+          <article class="panel group-card">
+            <h4>${escapeHtml(title)}</h4>
+            <div class="group-team-list">${rows}</div>
+            <div class="group-note">${escapeHtml(note)}</div>
+          </article>
+        `;
+      }
+
       function renderChampionsLeague() {
         const settings = normalizeLeagueSettings(state.leagueSettings);
         const container = document.querySelector("#championsLeagueSection .container");
@@ -3439,36 +3506,33 @@
           container.style.setProperty("--champions-logo", `url("${settings.championsLogo}")`);
           container.style.setProperty("--champions-watermark", `"${initials(settings.championsName)}"`);
         }
-        elements.championsGroupsGrid.innerHTML = Object.entries(settings.championsGroups)
-          .map(([groupName, teams]) => {
-            const rows = teams
-              .map((teamName, index) => {
-                const team = getTeamByName(teamName) || { team: teamName };
-                return `
-                  <div class="group-team">
-                    <div class="club">
-                      ${logoMarkup(team.team)}
-                      <span>
-                        ${escapeHtml(team.team)}
-                        <small>Grup mücadelesi</small>
-                      </span>
-                    </div>
-                    <strong>${index + 1}</strong>
-                  </div>
-                `;
-              })
-              .join("");
-            return `
-              <article class="panel group-card">
-                <h4>Grup ${escapeHtml(groupName)}</h4>
-                <div class="group-team-list">${rows}</div>
-                <div class="group-note">İlk sırayı alan takım üst tura yükselir.</div>
-              </article>
-            `;
-          })
+        const rankedTeams = sortTeams(activeTeams()).map((team) => team.team);
+        const directTeams = rankedTeams.slice(0, 3);
+        const playoffTeams = rankedTeams.slice(3, 7);
+        const playoffGroups = {
+          A: playoffTeams.slice(0, 2),
+          B: playoffTeams.slice(2, 4)
+        };
+        const playoffWinner = settings.playoffWinner || playoffTeams[0] || "Play-Off Kazananı";
+        const championsGroups = {
+          A: [directTeams[0] || "Lig 1.", playoffWinner],
+          B: [directTeams[1] || "Lig 2.", directTeams[2] || "Lig 3."]
+        };
+        elements.championsGroupsGrid.innerHTML = Object.entries(championsGroups)
+          .map(([groupName, teams]) => groupCard(`Grup ${groupName}`, teams, "ŞAMPUANLAR LİGİ", "İlk sırayı alan takım üst tura yükselir."))
           .join("");
-        const groupAWinner = settings.championsGroups.A?.[0] || "Grup A Galibi";
-        const groupBWinner = settings.championsGroups.B?.[0] || "Grup B Galibi";
+        elements.championsPlayoffGrid.innerHTML = Object.entries(playoffGroups)
+          .map(([groupName, teams]) => groupCard(`Play-Off ${groupName}`, teams, "Play-Off bileti", "İki play-off grubundan toplam 1 takım ŞAMPUANLAR LİGİ hakkı kazanır."))
+          .join("");
+        elements.playoffWinnerPanel.innerHTML = `
+          <div class="winner-label">ŞAMPUANLAR LİGİ Play-Off Kazananı</div>
+          <div class="club">
+            ${logoMarkup(playoffWinner)}
+            <span>${escapeHtml(playoffWinner)}</span>
+          </div>
+        `;
+        const groupAWinner = championsGroups.A?.[0] || "Grup A Galibi";
+        const groupBWinner = championsGroups.B?.[0] || "Grup B Galibi";
         elements.championsFinalPath.innerHTML = `
           <div class="winner-card">
             <div class="winner-label">Grup A Galibi</div>
@@ -3726,20 +3790,16 @@
             { name: "championsLogo", label: "Turnuva logo adresi", value: settings.championsLogo || "" },
             { name: "championsTrophy", label: "Turnuva kupa görsel adresi", value: settings.championsTrophy || "" },
             { name: "championsWinner", label: "Şampuanlar Ligi final galibi takım", value: settings.championsWinner || "" },
-            { name: "groupA", label: "Grup A takımları (virgülle 2 takım)", value: settings.championsGroups.A.join(", "), required: true },
-            { name: "groupB", label: "Grup B takımları (virgülle 2 takım)", value: settings.championsGroups.B.join(", "), required: true }
+            { name: "playoffWinner", label: "Play-Off kazanan takım (4-7 arasından)", value: settings.playoffWinner || "" }
           ],
-          async ({ championsName, championsLogo, championsTrophy, championsWinner, groupA, groupB }) => {
+          async ({ championsName, championsLogo, championsTrophy, championsWinner, playoffWinner }) => {
             state.leagueSettings = normalizeLeagueSettings({
               ...settings,
               championsName: championsName.trim() || "ŞAMPUANLAR LİGİ",
               championsLogo: championsLogo.trim(),
               championsTrophy: championsTrophy.trim(),
               championsWinner: championsWinner.trim(),
-              championsGroups: {
-                A: parseGroupTeams(groupA),
-                B: parseGroupTeams(groupB)
-              }
+              playoffWinner: playoffWinner.trim()
             });
             await commitChanges("Şampuanlar Ligi güncellendi.");
           }

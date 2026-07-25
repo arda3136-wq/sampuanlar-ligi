@@ -2107,7 +2107,11 @@
       const logoImageCache = new Map();
 
       function load(key, fallback) {
-        return structuredClone(fallback);
+        return cloneData(fallback);
+      }
+
+      function cloneData(value) {
+        return JSON.parse(JSON.stringify(value));
       }
 
       async function save() {
@@ -2148,7 +2152,7 @@
       async function loadServerState() {
         try {
           const data = await requestJson("/api/state");
-          state.teams = data.teams || state.teams;
+          state.teams = Array.isArray(data.teams) && data.teams.length ? data.teams : cloneData(defaultTeams);
           state.matches = (data.matches || state.matches).map(normalizeMatch);
           state.liveMatchIndex = Number.isInteger(data.liveMatchIndex) ? data.liveMatchIndex : state.liveMatchIndex;
           state.news = data.news || state.news;
@@ -2170,7 +2174,7 @@
           headers: { authorization: `Bearer ${adminToken()}` },
           body: JSON.stringify(publicState())
         });
-        state.teams = data.teams || state.teams;
+        state.teams = Array.isArray(data.teams) && data.teams.length ? data.teams : cloneData(defaultTeams);
         state.matches = (data.matches || state.matches).map(normalizeMatch);
         state.liveMatchIndex = Number.isInteger(data.liveMatchIndex) ? data.liveMatchIndex : state.liveMatchIndex;
         state.news = data.news || state.news;
@@ -2229,10 +2233,11 @@
       }
 
       function ensureTeamCapacity() {
+        if (!Array.isArray(state.teams) || !state.teams.length) state.teams = cloneData(defaultTeams);
         defaultTeams.forEach((defaultTeam) => {
           if (state.teams.length >= 10) return;
           const alreadyExists = state.teams.some((team) => team.team === defaultTeam.team);
-          if (!alreadyExists) state.teams.push(structuredClone(defaultTeam));
+          if (!alreadyExists) state.teams.push(cloneData(defaultTeam));
         });
       }
 
@@ -3750,4 +3755,42 @@
       });
 
       function openStatEditor(statKey, index = null) {
-        const row = index === null ? { player: "",
+        const row = index === null ? { player: "", team: state.teams[0]?.team || "", value: 0 } : state.stats[statKey][index];
+        const titles = {
+          goals: "Gol kaydı",
+          redCards: "Kırmızı kart kaydı",
+          yellowCards: "Sarı kart kaydı"
+        };
+        openEditor(
+          titles[statKey] || "Oyuncu kaydı",
+          [
+            { name: "player", label: "Oyuncu adı", value: row.player, required: true },
+            { name: "team", label: "Takım", value: row.team, required: true },
+            { name: "value", label: "Sayı", type: "number", value: row.value, required: true }
+          ],
+          async ({ player, team, value }) => {
+            const nextRow = { player: player.trim(), team: team.trim(), value: Number(value) };
+            if (index === null) {
+              state.stats[statKey].push(nextRow);
+            } else {
+              state.stats[statKey][index] = nextRow;
+            }
+            await commitChanges("Oyuncu istatistiği güncellendi.");
+          }
+        );
+      }
+
+      async function initialize() {
+        await loadServerState();
+        applyRequestedDefaults();
+        renameLegacyTeams();
+        render();
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>
+
+
+

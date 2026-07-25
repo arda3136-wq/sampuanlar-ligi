@@ -443,6 +443,48 @@
         margin-bottom: 22px;
       }
 
+      .history-panel {
+        margin-top: 22px;
+      }
+
+      .history-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .history-card {
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.07);
+        padding: 18px;
+      }
+
+      .history-card h4 {
+        color: white;
+        font-size: 22px;
+        font-weight: 1000;
+        margin-bottom: 12px;
+      }
+
+      .history-columns {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .history-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .history-list h5 {
+        margin: 0 0 4px;
+        color: var(--green);
+        font-size: 14px;
+        font-weight: 1000;
+        text-transform: uppercase;
+      }
+
       .summary-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1608,6 +1650,7 @@
         .poster-tool,
         .season-panel,
         .summary-grid,
+        .history-columns,
         .admin-grid {
           grid-template-columns: 1fr;
         }
@@ -1811,6 +1854,7 @@
               </aside>
             </div>
             <div id="leagueTrophyShowcase" class="trophy-showcase"></div>
+            <div id="seasonHistoryPanel" class="panel history-panel"></div>
           </div>
         </section>
 
@@ -1821,7 +1865,7 @@
                 <h3>Maçlar</h3>
                 <p>Fikstür Sistemi</p>
               </div>
-              <button id="addMatchButton" class="button">Maç Oluştur</button>
+              <button id="addMatchButton" class="button">Fikstürü Yenile</button>
             </div>
             <div id="matchesGrid" class="match-list"></div>
           </div>
@@ -2010,6 +2054,8 @@
         endDate: "2026-06-30"
       };
 
+      const defaultSeasonHistory = [];
+
       const defaultLeagueSettings = {
         leagueName: "LOS PESİCOS",
         leagueLogo: "",
@@ -2045,6 +2091,7 @@
         stats: load("league_stats", defaultStats),
         transfers: load("league_transfers", []),
         season: load("league_season", defaultSeason),
+        seasonHistory: load("league_season_history", defaultSeasonHistory),
         leagueSettings: load("league_settings", defaultLeagueSettings),
         fixturePoster: load("league_fixture_poster", defaultFixturePoster),
         teamOwner: sessionStorage.getItem("league_team_owner") || "",
@@ -2086,6 +2133,7 @@
         downloadPosterButton: document.getElementById("downloadPosterButton"),
         fixturePosterCanvas: document.getElementById("fixturePosterCanvas"),
         seasonPanel: document.getElementById("seasonPanel"),
+        seasonHistoryPanel: document.getElementById("seasonHistoryPanel"),
         championPanel: document.getElementById("championPanel"),
         seasonSummary: document.getElementById("seasonSummary"),
         standingsBody: document.getElementById("standingsBody"),
@@ -2131,6 +2179,7 @@
           stats: state.stats,
           transfers: state.transfers,
           season: state.season,
+          seasonHistory: state.seasonHistory,
           leagueSettings: state.leagueSettings,
           fixturePoster: state.fixturePoster
         };
@@ -2159,6 +2208,7 @@
           state.stats = { ...defaultStats, ...(data.stats || {}) };
           state.transfers = data.transfers || state.transfers;
           state.season = { ...defaultSeason, ...(data.season || {}) };
+          state.seasonHistory = Array.isArray(data.seasonHistory) ? data.seasonHistory : state.seasonHistory;
           state.leagueSettings = normalizeLeagueSettings(data.leagueSettings || state.leagueSettings);
           state.fixturePoster = { ...defaultFixturePoster, ...(data.fixturePoster || {}) };
           ensureTeamLogos();
@@ -2181,6 +2231,7 @@
         state.stats = { ...defaultStats, ...(data.stats || state.stats) };
         state.transfers = data.transfers || state.transfers;
         state.season = { ...defaultSeason, ...(data.season || state.season) };
+        state.seasonHistory = Array.isArray(data.seasonHistory) ? data.seasonHistory : state.seasonHistory;
         state.leagueSettings = normalizeLeagueSettings(data.leagueSettings || state.leagueSettings);
         state.fixturePoster = { ...defaultFixturePoster, ...(data.fixturePoster || state.fixturePoster) };
       }
@@ -2356,6 +2407,7 @@
         save("league_teams", state.teams);
         state.stats = { ...defaultStats, ...state.stats };
         state.season = { ...defaultSeason, ...state.season };
+        state.seasonHistory = Array.isArray(state.seasonHistory) ? state.seasonHistory : defaultSeasonHistory;
         state.leagueSettings = normalizeLeagueSettings(state.leagueSettings);
         state.fixturePoster = { ...defaultFixturePoster, ...state.fixturePoster };
       }
@@ -2420,6 +2472,7 @@
         renderNews();
         renderStandings();
         renderLeagueTrophy();
+        renderSeasonHistory();
         renderChampionAndSummary();
         renderMatches();
         renderChampionsLeague();
@@ -2979,7 +3032,14 @@
             <div class="season-label">Kalan Süre</div>
             <div class="season-value">${remainingText()}</div>
           </div>
-          ${state.isAdmin ? `<button class="button" data-action="edit-season">Takvimi Düzenle</button>` : ""}
+          ${
+            state.isAdmin
+              ? `
+                <button class="button" data-action="edit-season">Takvimi Düzenle</button>
+                <button class="button secondary" data-action="start-new-season">Yeni Sezon Başlat</button>
+              `
+              : ""
+          }
         `;
       }
 
@@ -3027,6 +3087,177 @@
             `
           )
           .join("");
+      }
+
+      function historyRows(rows, valueKey = "points", labelKey = "team") {
+        return rows.length
+          ? rows
+              .map(
+                (row, index) => `
+                  <div class="summary-item">
+                    <span>${index + 1}. ${escapeHtml(row[labelKey] || row.team || row.player)}</span>
+                    <strong>${Number(row[valueKey]) || 0}</strong>
+                  </div>
+                `
+              )
+              .join("")
+          : `<div class="summary-item"><span>Kayıt yok</span><strong>0</strong></div>`;
+      }
+
+      function renderSeasonHistory() {
+        const history = Array.isArray(state.seasonHistory) ? state.seasonHistory : [];
+        if (!history.length) {
+          elements.seasonHistoryPanel.innerHTML = `
+            <div class="section-head">
+              <div>
+                <h3>Geçmiş Sezonlar</h3>
+                <p>Henüz tamamlanan sezon arşivi yok.</p>
+              </div>
+            </div>
+          `;
+          return;
+        }
+        elements.seasonHistoryPanel.innerHTML = `
+          <div class="section-head">
+            <div>
+              <h3>Geçmiş Sezonlar</h3>
+              <p>Yeni sezon başlatıldığında eski sezonun özeti burada kalır.</p>
+            </div>
+          </div>
+          <div class="history-grid">
+            ${history
+              .map(
+                (season) => `
+                  <article class="history-card">
+                    <h4>${escapeHtml(season.name || "Sezon Özeti")}</h4>
+                    <div class="history-columns">
+                      <div class="history-list">
+                        <h5>Puan Durumu İlk 3</h5>
+                        ${historyRows(season.topTeams || [], "points")}
+                      </div>
+                      <div class="history-list">
+                        <h5>Gol Krallığı İlk 3</h5>
+                        ${historyRows(season.topGoals || [], "value", "player")}
+                      </div>
+                      <div class="history-list">
+                        <h5>Şampiyonluk Yüzdesi İlk 3</h5>
+                        ${(season.topOdds || [])
+                          .map(
+                            (row, index) => `
+                              <div class="summary-item">
+                                <span>${index + 1}. ${escapeHtml(row.team)}</span>
+                                <strong>${Number(row.percent || 0).toFixed(1)}%</strong>
+                              </div>
+                            `
+                          )
+                          .join("") || `<div class="summary-item"><span>Kayıt yok</span><strong>0%</strong></div>`}
+                      </div>
+                    </div>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        `;
+      }
+
+      function archiveCurrentSeason() {
+        const settings = normalizeLeagueSettings(state.leagueSettings);
+        return {
+          id: Date.now(),
+          name: `${settings.leagueName} ${dateLabel(state.season.startDate)} - ${dateLabel(state.season.endDate)}`,
+          archivedAt: new Date().toISOString(),
+          season: cloneData(state.season),
+          topTeams: sortTeams(state.teams).slice(0, 3).map((team) => ({
+            team: team.team,
+            points: Number(team.points) || 0,
+            played: Number(team.played) || 0,
+            wins: Number(team.wins) || 0,
+            draws: Number(team.draws) || 0,
+            losses: Number(team.losses) || 0,
+            goalsFor: Number(team.goalsFor) || 0,
+            goalsAgainst: Number(team.goalsAgainst) || 0,
+            average: goalDifference(team)
+          })),
+          topGoals: topStats("goals"),
+          topOdds: championshipOdds().slice(0, 3).map((team) => ({ team: team.team, percent: team.percent }))
+        };
+      }
+
+      function resetTeamsForNewSeason() {
+        state.teams = state.teams.map((team) => ({
+          ...team,
+          points: 0,
+          played: 0,
+          wins: 0,
+          draws: 0,
+          losses: 0,
+          goalsFor: 0,
+          goalsAgainst: 0,
+          form: "-----"
+        }));
+      }
+
+      function addDays(dateValue, days) {
+        const date = new Date(`${dateValue || todayKey()}T12:00:00`);
+        date.setDate(date.getDate() + days);
+        return date.toISOString().slice(0, 10);
+      }
+
+      function generateSeasonFixtures(teams, startDate = todayKey()) {
+        const teamNames = teams.map((team) => team.team).filter(Boolean);
+        if (teamNames.length < 2) return [];
+        const rotation = [...teamNames];
+        if (rotation.length % 2 === 1) rotation.push("BAY");
+        const teamCount = rotation.length;
+        const rounds = teamCount - 1;
+        const matchTimes = ["18:00", "18:30", "19:00", "20:00", "20:30"];
+        const fixtures = [];
+
+        for (let round = 0; round < rounds; round += 1) {
+          const roundDate = addDays(startDate, round * 7);
+          for (let index = 0; index < teamCount / 2; index += 1) {
+            const first = rotation[index];
+            const second = rotation[teamCount - 1 - index];
+            if (first === "BAY" || second === "BAY") continue;
+            const swap = round % 2 === 1;
+            fixtures.push({
+              home: swap ? second : first,
+              away: swap ? first : second,
+              score: "VS",
+              stadium: `Hafta ${round + 1}`,
+              time: matchTimes[index % matchTimes.length],
+              date: roundDate,
+              status: "pending"
+            });
+          }
+          rotation.splice(1, 0, rotation.pop());
+        }
+
+        return fixtures;
+      }
+
+      async function regenerateFixtures() {
+        const ok = confirm("Mevcut fikstür silinip takımlara göre otomatik sezon fikstürü oluşturulsun mu?");
+        if (!ok) return;
+        state.matches = generateSeasonFixtures(state.teams, state.season.startDate || todayKey());
+        state.liveMatchIndex = 0;
+        await commitChanges("Fikstür otomatik oluşturuldu.");
+      }
+
+      async function startNewSeason() {
+        const ok = confirm("Mevcut sezon arşive kaydedilip puan durumu, fikstür, transfer ve istatistikler sıfırlansın mı?");
+        if (!ok) return;
+        state.seasonHistory = [archiveCurrentSeason(), ...(state.seasonHistory || [])].slice(0, 12);
+        resetTeamsForNewSeason();
+        state.liveMatchIndex = 0;
+        state.stats = cloneData(defaultStats);
+        state.transfers = [];
+        state.leagueSettings = normalizeLeagueSettings({ ...state.leagueSettings, championsWinner: "" });
+        const today = todayKey();
+        state.season = { startDate: today, endDate: state.season.endDate && state.season.endDate > today ? state.season.endDate : today };
+        state.matches = generateSeasonFixtures(state.teams, state.season.startDate);
+        await commitChanges("Yeni sezon başlatıldı. Eski sezon arşive kaydedildi.");
       }
 
       function renderChampionAndSummary() {
@@ -3178,7 +3409,8 @@
               </div>
               <div class="match-details">
                 <strong>${escapeHtml(match.time || "Saat yok")}</strong>
-                ${escapeHtml(match.stadium || "Stadyum belirtilmedi")}
+                ${escapeHtml(match.date ? dateLabel(match.date) : match.stadium || "Stadyum belirtilmedi")}
+                ${match.date ? `<br>${escapeHtml(match.stadium || "Stadyum belirtilmedi")}` : ""}
               </div>
               <span class="match-status ${status.key}">${status.label}</span>
               ${
@@ -3514,22 +3746,7 @@
         );
       });
 
-      elements.addMatchButton.addEventListener("click", () => {
-        openEditor(
-          "Maç Oluştur",
-          [
-            { name: "home", label: "Ev sahibi takım", required: true },
-            { name: "away", label: "Deplasman takımı", required: true },
-            { name: "time", label: "Maç saati", value: "20:00", required: true },
-            { name: "stadium", label: "Stadyum", value: "League Arena", required: true },
-            { name: "status", label: "Durum", value: "Oynanmadı", required: true }
-          ],
-          async (values) => {
-            state.matches.push({ ...values, score: "VS", status: statusFromLabel(values.status) });
-            await commitChanges("Maç oluşturuldu.");
-          }
-        );
-      });
+      elements.addMatchButton.addEventListener("click", regenerateFixtures);
 
       elements.addTransferButton.addEventListener("click", () => {
         openEditor(
@@ -3701,6 +3918,10 @@
           );
         }
 
+        if (action === "start-new-season") {
+          await startNewSeason();
+        }
+
         if (action === "edit-match") {
           const match = state.matches[index];
           const currentStatus = matchStatus(match, index).label;
@@ -3709,12 +3930,13 @@
             [
               { name: "score", label: "Skor", value: match.score || "VS", required: true },
               { name: "status", label: "Durum: Oynanmadı / Canlı / Bitti", value: currentStatus, required: true },
+              { name: "date", label: "Maç tarihi", type: "date", value: match.date || state.season.startDate || todayKey(), required: true },
               { name: "time", label: "Maç saati", value: match.time || "", required: true },
               { name: "stadium", label: "Stadyum", value: match.stadium || "", required: true }
             ],
-            async ({ score, status, time, stadium }) => {
+            async ({ score, status, date, time, stadium }) => {
               const nextStatus = statusFromLabel(status);
-              state.matches[index] = { ...match, score, status: nextStatus, time, stadium };
+              state.matches[index] = { ...match, score, status: nextStatus, date, time, stadium };
               if (nextStatus === "live") state.liveMatchIndex = index;
               await commitChanges("Maç güncellendi.");
             }

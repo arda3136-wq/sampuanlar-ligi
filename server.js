@@ -114,7 +114,7 @@ function json(response, status, body) {
 
 function normalizeState(input = {}) {
   return migrateLegacyTeamNames({
-    teams: Array.isArray(input.teams) ? input.teams : defaultState.teams,
+    teams: normalizeTeams(input.teams),
     matches: Array.isArray(input.matches) ? input.matches : defaultState.matches,
     liveMatchIndex: Number.isInteger(input.liveMatchIndex) ? input.liveMatchIndex : defaultState.liveMatchIndex,
     news: Array.isArray(input.news) ? input.news : defaultState.news,
@@ -136,6 +136,17 @@ function normalizeState(input = {}) {
       ...(input.fixturePoster && typeof input.fixturePoster === "object" ? input.fixturePoster : {})
     }
   });
+}
+
+function normalizeTeams(teams) {
+  const nextTeams = Array.isArray(teams) && teams.length
+    ? teams.map((team) => ({ ...team }))
+    : defaultState.teams.map((team) => ({ ...team }));
+  defaultState.teams.forEach((defaultTeam) => {
+    if (nextTeams.length >= 10) return;
+    if (!nextTeams.some((team) => team.team === defaultTeam.team)) nextTeams.push({ ...defaultTeam });
+  });
+  return nextTeams;
 }
 
 function migrateLegacyTeamNames(state) {

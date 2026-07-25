@@ -722,11 +722,63 @@
         object-fit: cover;
       }
 
+      .champions-stage-layout {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        gap: 18px;
+      }
+
+      .stage-block {
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 20px;
+        background: rgba(8, 31, 42, 0.34);
+        padding: clamp(16px, 3vw, 22px);
+      }
+
+      .stage-block.featured {
+        background:
+          linear-gradient(135deg, rgba(255, 209, 102, 0.12), rgba(126, 231, 200, 0.08)),
+          rgba(8, 31, 42, 0.38);
+      }
+
+      .stage-title {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+
+      .stage-title h4 {
+        color: white;
+        font-size: clamp(22px, 3vw, 30px);
+        font-weight: 1000;
+      }
+
+      .stage-title p {
+        margin-top: 6px;
+        color: rgba(255, 255, 255, 0.58);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .stage-chip {
+        flex: 0 0 auto;
+        border: 1px solid rgba(255, 209, 102, 0.26);
+        border-radius: 999px;
+        background: rgba(255, 209, 102, 0.13);
+        color: #ffe08a;
+        padding: 8px 11px;
+        font-size: 12px;
+        font-weight: 1000;
+        white-space: nowrap;
+      }
+
       .group-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: clamp(28px, 6vw, 72px);
-        margin-top: 28px;
+        gap: 16px;
       }
 
       .group-card {
@@ -813,21 +865,41 @@
       .playoff-stage {
         position: relative;
         z-index: 1;
-        margin-top: 28px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(230px, 0.48fr);
+        align-items: stretch;
+        gap: 16px;
       }
 
-      .playoff-stage .section-head {
-        margin-bottom: 16px;
+      .playoff-stage .group-card {
+        padding: 18px;
+      }
+
+      .playoff-stage .group-card h4 {
+        font-size: 21px;
+      }
+
+      .playoff-stage .group-team {
+        min-height: 58px;
+        padding: 10px 0;
       }
 
       .playoff-winner {
         position: relative;
         z-index: 1;
-        margin-top: 18px;
+        display: grid;
+        align-content: center;
+        margin-top: 0;
         border: 1px solid rgba(255, 209, 102, 0.22);
         border-radius: 18px;
         background: linear-gradient(135deg, rgba(255, 209, 102, 0.16), rgba(126, 231, 200, 0.09));
         padding: 18px;
+      }
+
+      .playoff-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
       }
 
       #championsLeagueSection {
@@ -875,7 +947,7 @@
       }
 
       #championsLeagueSection .section-head,
-      #championsGroupsGrid,
+      .champions-stage-layout,
       .final-path {
         position: relative;
         z-index: 1;
@@ -1663,6 +1735,8 @@
         .hero-grid,
         .standings-layout,
         .group-grid,
+        .playoff-stage,
+        .playoff-grid,
         .transfer-grid,
         .stats-grid,
         .news-grid,
@@ -1685,7 +1759,7 @@
           width: 100%;
         }
 
-      .match-row {
+        .match-row {
           grid-template-columns: 1fr auto 1fr;
         }
 
@@ -1723,8 +1797,14 @@
         .score-row,
         .fixture,
         .final-path,
+        .stage-title,
         .trophy-showcase {
           grid-template-columns: 1fr;
+        }
+
+        .stage-title {
+          align-items: flex-start;
+          flex-direction: column;
         }
 
         .match-row {
@@ -1903,18 +1983,41 @@
               </div>
               <button id="championsSettingsButton" class="button" style="display: none;">Grupları Düzenle</button>
             </div>
-            <div id="championsGroupsGrid" class="group-grid"></div>
-            <div class="playoff-stage">
-              <div class="section-head">
-                <div>
-                  <h3>Play-Off Grupları</h3>
-                  <p>Normal ligde 4-7 arasındaki takımlar oynar, sadece 1 takım ŞAMPUANLAR LİGİ bileti alır.</p>
+            <div class="champions-stage-layout">
+              <div class="stage-block featured">
+                <div class="stage-title">
+                  <div>
+                    <h4>Ana Grup Aşaması</h4>
+                    <p>Adminin belirlediği Şampuanlar Ligi grupları.</p>
+                  </div>
+                  <span class="stage-chip">VIP TURNUVA</span>
+                </div>
+                <div id="championsGroupsGrid" class="group-grid"></div>
+              </div>
+              <div class="stage-block">
+                <div class="stage-title">
+                  <div>
+                    <h4>Play-Off Yolu</h4>
+                    <p>Adminin belirlediği play-off eşleşmeleri ve ana turnuvaya gidecek takım.</p>
+                  </div>
+                  <span class="stage-chip">1 BİLET</span>
+                </div>
+                <div class="playoff-stage">
+                  <div id="championsPlayoffGrid" class="playoff-grid"></div>
+                  <div id="playoffWinnerPanel" class="playoff-winner"></div>
                 </div>
               </div>
-              <div id="championsPlayoffGrid" class="group-grid"></div>
-              <div id="playoffWinnerPanel" class="playoff-winner"></div>
+              <div class="stage-block featured">
+                <div class="stage-title">
+                  <div>
+                    <h4>Final Yolu</h4>
+                    <p>Grup galipleri finalde kupaya yürür.</p>
+                  </div>
+                  <span class="stage-chip">FİNAL</span>
+                </div>
+                <div id="championsFinalPath" class="final-path"></div>
+              </div>
             </div>
-            <div id="championsFinalPath" class="final-path"></div>
             <div id="championsTrophyShowcase" class="trophy-showcase"></div>
           </div>
         </section>
@@ -2100,6 +2203,10 @@
         championsGroups: {
           A: ["AC MİLAN", "GALATASARAY"],
           B: ["ARSENAL", "FENERBAHÇE"]
+        },
+        championsPlayoffGroups: {
+          A: ["FENERBAHÇE", "İNTER NAZİONALE MİLAN"],
+          B: ["TAKIM 6", "TAKIM 7"]
         }
       };
 
@@ -2371,6 +2478,7 @@
 
       function normalizeLeagueSettings(settings = {}) {
         const groups = settings.championsGroups || {};
+        const playoffGroups = settings.championsPlayoffGroups || {};
         return {
           ...defaultLeagueSettings,
           ...settings,
@@ -2379,6 +2487,10 @@
           championsGroups: {
             A: Array.isArray(groups.A) ? groups.A.slice(0, 2) : defaultLeagueSettings.championsGroups.A,
             B: Array.isArray(groups.B) ? groups.B.slice(0, 2) : defaultLeagueSettings.championsGroups.B
+          },
+          championsPlayoffGroups: {
+            A: Array.isArray(playoffGroups.A) ? playoffGroups.A.slice(0, 2) : defaultLeagueSettings.championsPlayoffGroups.A,
+            B: Array.isArray(playoffGroups.B) ? playoffGroups.B.slice(0, 2) : defaultLeagueSettings.championsPlayoffGroups.B
           }
         };
       }
@@ -3506,18 +3618,9 @@
           container.style.setProperty("--champions-logo", `url("${settings.championsLogo}")`);
           container.style.setProperty("--champions-watermark", `"${initials(settings.championsName)}"`);
         }
-        const rankedTeams = sortTeams(activeTeams()).map((team) => team.team);
-        const directTeams = rankedTeams.slice(0, 3);
-        const playoffTeams = rankedTeams.slice(3, 7);
-        const playoffGroups = {
-          A: playoffTeams.slice(0, 2),
-          B: playoffTeams.slice(2, 4)
-        };
-        const playoffWinner = settings.playoffWinner || playoffTeams[0] || "Play-Off Kazananı";
-        const championsGroups = {
-          A: [directTeams[0] || "Lig 1.", playoffWinner],
-          B: [directTeams[1] || "Lig 2.", directTeams[2] || "Lig 3."]
-        };
+        const playoffGroups = settings.championsPlayoffGroups;
+        const playoffWinner = settings.playoffWinner || "Play-Off Kazananı";
+        const championsGroups = settings.championsGroups;
         elements.championsGroupsGrid.innerHTML = Object.entries(championsGroups)
           .map(([groupName, teams]) => groupCard(`Grup ${groupName}`, teams, "ŞAMPUANLAR LİGİ", "İlk sırayı alan takım üst tura yükselir."))
           .join("");
@@ -3790,16 +3893,28 @@
             { name: "championsLogo", label: "Turnuva logo adresi", value: settings.championsLogo || "" },
             { name: "championsTrophy", label: "Turnuva kupa görsel adresi", value: settings.championsTrophy || "" },
             { name: "championsWinner", label: "Şampuanlar Ligi final galibi takım", value: settings.championsWinner || "" },
-            { name: "playoffWinner", label: "Play-Off kazanan takım (4-7 arasından)", value: settings.playoffWinner || "" }
+            { name: "playoffWinner", label: "Play-Off kazanan takım", value: settings.playoffWinner || "" },
+            { name: "groupA", label: "Şampuanlar Ligi Grup A takımları (virgülle 2 takım)", value: settings.championsGroups.A.join(", "), required: true },
+            { name: "groupB", label: "Şampuanlar Ligi Grup B takımları (virgülle 2 takım)", value: settings.championsGroups.B.join(", "), required: true },
+            { name: "playoffGroupA", label: "Play-Off Grup A takımları (virgülle 2 takım)", value: settings.championsPlayoffGroups.A.join(", "), required: true },
+            { name: "playoffGroupB", label: "Play-Off Grup B takımları (virgülle 2 takım)", value: settings.championsPlayoffGroups.B.join(", "), required: true }
           ],
-          async ({ championsName, championsLogo, championsTrophy, championsWinner, playoffWinner }) => {
+          async ({ championsName, championsLogo, championsTrophy, championsWinner, playoffWinner, groupA, groupB, playoffGroupA, playoffGroupB }) => {
             state.leagueSettings = normalizeLeagueSettings({
               ...settings,
               championsName: championsName.trim() || "ŞAMPUANLAR LİGİ",
               championsLogo: championsLogo.trim(),
               championsTrophy: championsTrophy.trim(),
               championsWinner: championsWinner.trim(),
-              playoffWinner: playoffWinner.trim()
+              playoffWinner: playoffWinner.trim(),
+              championsGroups: {
+                A: parseGroupTeams(groupA),
+                B: parseGroupTeams(groupB)
+              },
+              championsPlayoffGroups: {
+                A: parseGroupTeams(playoffGroupA),
+                B: parseGroupTeams(playoffGroupB)
+              }
             });
             await commitChanges("Şampuanlar Ligi güncellendi.");
           }

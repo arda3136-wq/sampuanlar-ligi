@@ -17,12 +17,12 @@ const TOKEN_MAX_AGE_MS = 12 * 60 * 60 * 1000;
 const defaultState = {
   teams: [
     { team: "AC MİLAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
-    { team: "GALATASARAY", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
     { team: "ARSENAL", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
+    { team: "GALATASARAY", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
+    { team: "BARCELONA", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
+    { team: "REAL MADRİD", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
     { team: "FENERBAHÇE", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
-    { team: "İNTER NAZİONALE MİLAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
-    { team: "TAKIM 6", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
-    { team: "TAKIM 7", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
+    { team: "PARİS SAİNT-GERMAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
     { team: "TAKIM 8", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
     { team: "TAKIM 9", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" },
     { team: "TAKIM 10", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: "" }
@@ -46,7 +46,7 @@ const defaultState = {
     ],
     redCards: [
       { player: "Oyuncu 1", team: "AC MİLAN", value: 0 },
-      { player: "Oyuncu 2", team: "İNTER NAZİONALE MİLAN", value: 0 }
+      { player: "Oyuncu 2", team: "REAL MADRİD", value: 0 }
     ],
     yellowCards: [
       { player: "Oyuncu 3", team: "FENERBAHÇE", value: 0 },
@@ -70,11 +70,11 @@ const defaultState = {
     playoffWinner: "",
     championsGroups: {
       A: ["AC MİLAN", "GALATASARAY"],
-      B: ["ARSENAL", "FENERBAHÇE"]
+      B: ["ARSENAL", "BARCELONA"]
     },
     championsPlayoffGroups: {
-      A: ["FENERBAHÇE", "İNTER NAZİONALE MİLAN"],
-      B: ["TAKIM 6", "TAKIM 7"]
+      A: ["REAL MADRİD", "FENERBAHÇE"],
+      B: ["PARİS SAİNT-GERMAN", "BARCELONA"]
     }
   },
   fixturePoster: {
@@ -94,12 +94,12 @@ const defaultState = {
 function parseTeamCodes(raw) {
   const fallback = {
     "AC MİLAN": "ACMILAN2026",
-    GALATASARAY: "GS2026",
     ARSENAL: "ARS2026",
+    GALATASARAY: "GS2026",
+    BARCELONA: "BARCA2026",
+    "REAL MADRİD": "REAL2026",
     "FENERBAHÇE": "FB2026",
-    "İNTER NAZİONALE MİLAN": "INTER2026",
-    "TAKIM 6": "TAKIM62026",
-    "TAKIM 7": "TAKIM72026",
+    "PARİS SAİNT-GERMAN": "PSG2026",
     "TAKIM 8": "TAKIM82026",
     "TAKIM 9": "TAKIM92026",
     "TAKIM 10": "TAKIM102026"
@@ -176,7 +176,10 @@ function normalizeTeams(teams) {
 function migrateLegacyTeamNames(state) {
   const renameMap = {
     AJAX: "AC MİLAN",
-    GALATASARAT: "GALATASARAY"
+    GALATASARAT: "GALATASARAY",
+    "İNTER NAZİONALE MİLAN": "BARCELONA",
+    "TAKIM 6": "REAL MADRİD",
+    "TAKIM 7": "PARİS SAİNT-GERMAN"
   };
   const rename = (name) => renameMap[name] || name;
   const renameRows = (rows = []) => Array.isArray(rows) ? rows.map((row) => ({ ...row, team: rename(row.team) })) : rows;

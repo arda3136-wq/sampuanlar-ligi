@@ -2413,12 +2413,12 @@
     <script>
       const defaultTeams = [
         { team: "AC MİLAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("ACM", "#151515", "#e23b4a") },
-        { team: "GALATASARAY", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("GS", "#f4c95d", "#b21f2d") },
         { team: "ARSENAL", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("ARS", "#ef233c", "#f6f6f6") },
+        { team: "GALATASARAY", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("GS", "#f4c95d", "#b21f2d") },
+        { team: "BARCELONA", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("BAR", "#8b1d3f", "#1d4ed8") },
+        { team: "REAL MADRİD", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("RMA", "#f8fafc", "#d4af37") },
         { team: "FENERBAHÇE", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("FB", "#ffe033", "#123c8c") },
-        { team: "İNTER NAZİONALE MİLAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("INT", "#1d4ed8", "#0f172a") },
-        { team: "TAKIM 6", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("T6", "#0f766e", "#7ee7c8") },
-        { team: "TAKIM 7", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("T7", "#1d4ed8", "#8fc8ff") },
+        { team: "PARİS SAİNT-GERMAN", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("PSG", "#123c8c", "#e11d48") },
         { team: "TAKIM 8", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("T8", "#7c3aed", "#c4b5fd") },
         { team: "TAKIM 9", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("T9", "#be123c", "#fb7185") },
         { team: "TAKIM 10", points: 0, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: "-----", logo: teamLogo("T10", "#ca8a04", "#fde68a") }
@@ -2446,7 +2446,7 @@
         ],
         redCards: [
           { player: "Oyuncu 1", team: "AC MİLAN", value: 0 },
-          { player: "Oyuncu 2", team: "İNTER NAZİONALE MİLAN", value: 0 }
+          { player: "Oyuncu 2", team: "REAL MADRİD", value: 0 }
         ],
         yellowCards: [
           { player: "Oyuncu 3", team: "FENERBAHÇE", value: 0 },
@@ -2472,11 +2472,11 @@
         playoffWinner: "",
         championsGroups: {
           A: ["AC MİLAN", "GALATASARAY"],
-          B: ["ARSENAL", "FENERBAHÇE"]
+          B: ["ARSENAL", "BARCELONA"]
         },
         championsPlayoffGroups: {
-          A: ["FENERBAHÇE", "İNTER NAZİONALE MİLAN"],
-          B: ["TAKIM 6", "TAKIM 7"]
+          A: ["REAL MADRİD", "FENERBAHÇE"],
+          B: ["PARİS SAİNT-GERMAN", "BARCELONA"]
         }
       };
 
@@ -2862,7 +2862,10 @@
       function renameLegacyTeams() {
         const renameMap = {
           AJAX: "AC MİLAN",
-          GALATASARAT: "GALATASARAY"
+          GALATASARAT: "GALATASARAY",
+          "İNTER NAZİONALE MİLAN": "BARCELONA",
+          "TAKIM 6": "REAL MADRİD",
+          "TAKIM 7": "PARİS SAİNT-GERMAN"
         };
         let changed = false;
         Object.entries(renameMap).forEach(([oldName, newName]) => {

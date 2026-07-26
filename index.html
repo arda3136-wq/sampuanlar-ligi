@@ -1048,6 +1048,197 @@
         font-weight: 800;
       }
 
+      .bracket-layout {
+        position: relative;
+        overflow: hidden;
+        min-height: 640px;
+        border: 1px solid rgba(90, 160, 255, 0.24);
+        border-radius: 26px;
+        background:
+          radial-gradient(circle at 50% 35%, rgba(0, 194, 255, 0.18), transparent 18rem),
+          linear-gradient(135deg, rgba(9, 20, 82, 0.96), rgba(2, 7, 42, 0.98));
+        padding: clamp(18px, 3vw, 34px);
+        box-shadow: 0 28px 90px rgba(0, 0, 0, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.055);
+      }
+
+      .bracket-layout::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(120deg, transparent 0 34%, rgba(65, 107, 255, 0.22) 34.2% 34.55%, transparent 34.8%),
+          linear-gradient(58deg, transparent 0 64%, rgba(0, 194, 255, 0.15) 64.2% 64.55%, transparent 64.8%),
+          radial-gradient(circle at 50% 50%, transparent 0 23rem, rgba(0, 0, 0, 0.22) 36rem);
+        opacity: 0.82;
+      }
+
+      .bracket-kicker,
+      .bracket-title,
+      .bracket-grid {
+        position: relative;
+        z-index: 1;
+      }
+
+      .bracket-kicker {
+        color: rgba(255, 255, 255, 0.84);
+        text-align: center;
+        font-size: clamp(18px, 3vw, 34px);
+        font-weight: 900;
+        letter-spacing: 0.24em;
+      }
+
+      .bracket-title {
+        margin: 8px 0 24px;
+        color: white;
+        text-align: center;
+        font-size: clamp(32px, 5vw, 58px);
+        font-weight: 1000;
+        line-height: 0.95;
+        text-shadow: 0 0 28px rgba(0, 194, 255, 0.34);
+      }
+
+      .bracket-grid {
+        display: grid;
+        grid-template-columns: minmax(230px, 1fr) minmax(220px, 0.72fr) minmax(230px, 1fr);
+        align-items: center;
+        gap: clamp(18px, 3vw, 34px);
+      }
+
+      .bracket-side {
+        display: grid;
+        gap: clamp(18px, 4vw, 40px);
+      }
+
+      .bracket-group {
+        position: relative;
+        display: grid;
+        gap: 10px;
+      }
+
+      .bracket-group::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: clamp(30px, 5vw, 66px);
+        height: 2px;
+        background: currentColor;
+        opacity: 0.86;
+      }
+
+      .bracket-side.left {
+        color: #d8e5f2;
+      }
+
+      .bracket-side.right {
+        color: #00c2ff;
+      }
+
+      .bracket-side.left .bracket-group::after {
+        right: calc(clamp(30px, 5vw, 66px) * -1);
+        box-shadow: 0 0 16px rgba(216, 229, 242, 0.26);
+      }
+
+      .bracket-side.right .bracket-group::after {
+        left: calc(clamp(30px, 5vw, 66px) * -1);
+        box-shadow: 0 0 16px rgba(0, 194, 255, 0.34);
+      }
+
+      .bracket-slot {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        gap: 10px;
+        min-height: 52px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: linear-gradient(180deg, #e7eef7, #cbd8e5);
+        color: #0c1832;
+        padding: 8px 12px;
+        font-size: clamp(13px, 1.7vw, 16px);
+        font-weight: 1000;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.26);
+      }
+
+      .bracket-side.left .bracket-slot {
+        border-radius: 3px 0 0 3px;
+      }
+
+      .bracket-side.right .bracket-slot {
+        border-radius: 0 3px 3px 0;
+      }
+
+      .bracket-tag {
+        justify-self: start;
+        border-radius: 999px;
+        background: currentColor;
+        color: #07112b;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 1000;
+      }
+
+      .bracket-side.right .bracket-tag {
+        justify-self: end;
+      }
+
+      .bracket-center {
+        display: grid;
+        justify-items: center;
+        gap: 16px;
+      }
+
+      .bracket-cup {
+        display: grid;
+        width: min(100%, 220px);
+        aspect-ratio: 1 / 1;
+        place-items: center;
+        border-radius: 30px;
+        background:
+          radial-gradient(circle at 45% 18%, rgba(255, 255, 255, 0.9), transparent 18%),
+          linear-gradient(135deg, rgba(230, 241, 255, 0.24), rgba(0, 194, 255, 0.09));
+        color: white;
+        font-size: 62px;
+        font-weight: 1000;
+        text-align: center;
+        box-shadow: 0 0 44px rgba(0, 194, 255, 0.24);
+        overflow: hidden;
+      }
+
+      .bracket-cup img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 14px;
+      }
+
+      .bracket-ticket,
+      .bracket-final-summary {
+        width: min(100%, 280px);
+        border: 1px solid rgba(0, 194, 255, 0.34);
+        border-radius: 18px;
+        background: rgba(3, 10, 44, 0.72);
+        padding: 14px;
+        color: white;
+        text-align: center;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      }
+
+      .bracket-ticket .club,
+      .bracket-final-summary .club {
+        justify-content: center;
+      }
+
+      .bracket-final-summary {
+        display: grid;
+        gap: 10px;
+      }
+
+      .bracket-final-title {
+        color: #00c2ff;
+        font-size: 22px;
+        font-weight: 1000;
+      }
+
       table {
         width: 100%;
         min-width: 680px;
@@ -1363,6 +1554,7 @@
       .transfer-grid,
       .stats-grid,
       .news-grid,
+      .quiz-grid,
       .admin-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1488,6 +1680,63 @@
         flex-wrap: wrap;
         gap: 8px;
         margin-top: 16px;
+      }
+
+      .quiz-grid {
+        margin-bottom: 36px;
+      }
+
+      .quiz-card {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 18px;
+        background:
+          radial-gradient(circle at 12% 8%, rgba(255, 209, 102, 0.2), transparent 12rem),
+          linear-gradient(135deg, rgba(126, 231, 200, 0.14), rgba(255, 255, 255, 0.07)),
+          rgba(8, 31, 42, 0.5);
+        padding: 22px;
+        box-shadow: 0 22px 70px rgba(0, 0, 0, 0.18);
+      }
+
+      .quiz-card::before {
+        content: "?";
+        position: absolute;
+        right: 14px;
+        top: -18px;
+        color: rgba(255, 255, 255, 0.08);
+        font-size: 110px;
+        font-weight: 1000;
+      }
+
+      .quiz-card h4,
+      .quiz-card p,
+      .quiz-actions {
+        position: relative;
+        z-index: 1;
+      }
+
+      .quiz-card h4 {
+        color: white;
+        font-size: 22px;
+        font-weight: 1000;
+        line-height: 1.2;
+      }
+
+      .quiz-card p {
+        margin-top: 14px;
+        border-left: 3px solid var(--yellow);
+        color: rgba(255, 255, 255, 0.72);
+        padding-left: 12px;
+        line-height: 1.55;
+        font-weight: 800;
+      }
+
+      .quiz-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 18px;
       }
 
       .poster-tool {
@@ -1740,6 +1989,7 @@
         .transfer-grid,
         .stats-grid,
         .news-grid,
+        .quiz-grid,
         .team-owner-grid,
         .poster-tool,
         .season-panel,
@@ -1776,6 +2026,18 @@
         .match-actions .button {
           flex: 1 1 90px;
         }
+
+        .bracket-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .bracket-center {
+          order: -1;
+        }
+
+        .bracket-group::after {
+          display: none;
+        }
       }
 
       @media (max-width: 560px) {
@@ -1805,6 +2067,23 @@
         .stage-title {
           align-items: flex-start;
           flex-direction: column;
+        }
+
+        .bracket-layout {
+          min-height: 0;
+          padding: 16px;
+        }
+
+        .bracket-kicker {
+          letter-spacing: 0.16em;
+        }
+
+        .bracket-title {
+          margin-bottom: 18px;
+        }
+
+        .bracket-slot {
+          min-height: 48px;
         }
 
         .match-row {
@@ -1902,6 +2181,14 @@
           <div class="container">
             <div class="section-head">
               <div>
+                <h3>Lig Eğlencesi</h3>
+                <p>Sezon başlamadan önce eğlencelik soru-cevap kartları</p>
+              </div>
+              <button id="addQuizButton" class="button">Soru Ekle</button>
+            </div>
+            <div id="quizGrid" class="quiz-grid"></div>
+            <div class="section-head">
+              <div>
                 <h3>Haberler</h3>
                 <p>Kısa ve fotoğraflı lig haberleri</p>
               </div>
@@ -1983,42 +2270,19 @@
               </div>
               <button id="championsSettingsButton" class="button" style="display: none;">Grupları Düzenle</button>
             </div>
-            <div class="champions-stage-layout">
-              <div class="stage-block featured">
-                <div class="stage-title">
-                  <div>
-                    <h4>Ana Grup Aşaması</h4>
-                    <p>Adminin belirlediği Şampuanlar Ligi grupları.</p>
-                  </div>
-                  <span class="stage-chip">VIP TURNUVA</span>
+            <div class="champions-stage-layout bracket-layout">
+              <div class="bracket-kicker">ROAD TO</div>
+              <div class="bracket-title">ŞAMPUANLAR LİGİ</div>
+              <div class="bracket-grid">
+                <div id="championsPlayoffGrid" class="bracket-side left"></div>
+                <div class="bracket-center">
+                  <div id="championsTrophyShowcase" class="bracket-cup"></div>
+                  <div id="playoffWinnerPanel" class="bracket-ticket"></div>
+                  <div id="championsFinalPath" class="bracket-final-summary"></div>
                 </div>
-                <div id="championsGroupsGrid" class="group-grid"></div>
-              </div>
-              <div class="stage-block">
-                <div class="stage-title">
-                  <div>
-                    <h4>Play-Off Yolu</h4>
-                    <p>Adminin belirlediği play-off eşleşmeleri ve ana turnuvaya gidecek takım.</p>
-                  </div>
-                  <span class="stage-chip">1 BİLET</span>
-                </div>
-                <div class="playoff-stage">
-                  <div id="championsPlayoffGrid" class="playoff-grid"></div>
-                  <div id="playoffWinnerPanel" class="playoff-winner"></div>
-                </div>
-              </div>
-              <div class="stage-block featured">
-                <div class="stage-title">
-                  <div>
-                    <h4>Final Yolu</h4>
-                    <p>Grup galipleri finalde kupaya yürür.</p>
-                  </div>
-                  <span class="stage-chip">FİNAL</span>
-                </div>
-                <div id="championsFinalPath" class="final-path"></div>
+                <div id="championsGroupsGrid" class="bracket-side right"></div>
               </div>
             </div>
-            <div id="championsTrophyShowcase" class="trophy-showcase"></div>
           </div>
         </section>
 
@@ -2168,6 +2432,12 @@
       ];
 
       const defaultNews = [];
+      const defaultQuiz = [
+        {
+          question: "Bu sezonun sürpriz takımı kim olur?",
+          answer: "Admin cevabı buraya yazar."
+        }
+      ];
 
       const defaultStats = {
         goals: [
@@ -2228,6 +2498,7 @@
         matches: load("league_matches", defaultMatches),
         liveMatchIndex: 0,
         news: load("league_news", defaultNews),
+        quiz: load("league_quiz", defaultQuiz),
         stats: load("league_stats", defaultStats),
         transfers: load("league_transfers", []),
         season: load("league_season", defaultSeason),
@@ -2256,10 +2527,12 @@
         addMatchButton: document.getElementById("addMatchButton"),
         addTransferButton: document.getElementById("addTransferButton"),
         addNewsButton: document.getElementById("addNewsButton"),
+        addQuizButton: document.getElementById("addQuizButton"),
         liveMatchBoard: document.getElementById("liveMatchBoard"),
         liveMatchStatus: document.getElementById("liveMatchStatus"),
         teamOwnerSection: document.getElementById("teamOwnerSection"),
         teamOwnerPanel: document.getElementById("teamOwnerPanel"),
+        quizGrid: document.getElementById("quizGrid"),
         newsGrid: document.getElementById("newsGrid"),
         posterControls: document.getElementById("posterControls"),
         posterHome: document.getElementById("posterHome"),
@@ -2318,6 +2591,7 @@
           matches: state.matches,
           liveMatchIndex: state.liveMatchIndex,
           news: state.news,
+          quiz: state.quiz,
           stats: state.stats,
           transfers: state.transfers,
           season: state.season,
@@ -2347,6 +2621,7 @@
           state.matches = (data.matches || state.matches).map(normalizeMatch);
           state.liveMatchIndex = Number.isInteger(data.liveMatchIndex) ? data.liveMatchIndex : state.liveMatchIndex;
           state.news = data.news || state.news;
+          state.quiz = data.quiz || state.quiz;
           state.stats = { ...defaultStats, ...(data.stats || {}) };
           state.transfers = data.transfers || state.transfers;
           state.season = { ...defaultSeason, ...(data.season || {}) };
@@ -2370,6 +2645,7 @@
         state.matches = (data.matches || state.matches).map(normalizeMatch);
         state.liveMatchIndex = Number.isInteger(data.liveMatchIndex) ? data.liveMatchIndex : state.liveMatchIndex;
         state.news = data.news || state.news;
+        state.quiz = data.quiz || state.quiz;
         state.stats = { ...defaultStats, ...(data.stats || state.stats) };
         state.transfers = data.transfers || state.transfers;
         state.season = { ...defaultSeason, ...(data.season || state.season) };
@@ -2620,6 +2896,7 @@
         renderLiveMatch();
         renderSeason();
         renderTeamOwner();
+        renderQuiz();
         renderNews();
         renderStandings();
         renderLeagueTrophy();
@@ -2655,6 +2932,7 @@
         elements.addMatchButton.style.display = state.isAdmin ? "inline-flex" : "none";
         elements.addTransferButton.style.display = state.isAdmin ? "inline-flex" : "none";
         elements.addNewsButton.style.display = state.isAdmin ? "inline-flex" : "none";
+        elements.addQuizButton.style.display = state.isAdmin ? "inline-flex" : "none";
       }
 
       function logoBox(element, text, logo) {
@@ -2737,6 +3015,29 @@
             <div class="team-owner-stat"><span>YG</span><strong>${Number(team.goalsAgainst) || 0}</strong></div>
           </div>
         `;
+      }
+
+      function renderQuiz() {
+        const items = Array.isArray(state.quiz) ? state.quiz : [];
+        if (!items.length) {
+          elements.quizGrid.innerHTML = `<div class="empty">Henüz eğlencelik soru eklenmedi.</div>`;
+          return;
+        }
+        elements.quizGrid.innerHTML = items
+          .map(
+            (item, index) => `
+              <article class="quiz-card">
+                <h4>${escapeHtml(item.question || "Soru")}</h4>
+                <p>${escapeHtml(item.answer || "Cevap yakında.")}</p>
+                ${
+                  state.isAdmin
+                    ? `<div class="quiz-actions"><button class="button small ghost-danger" data-action="delete-quiz" data-index="${index}">Sil</button></div>`
+                    : ""
+                }
+              </article>
+            `
+          )
+          .join("");
       }
 
       function renderNews() {
@@ -3610,6 +3911,28 @@
         `;
       }
 
+      function bracketSlot(teamName) {
+        const safeName = teamName || "Takım";
+        const team = getTeamByName(safeName) || { team: safeName };
+        return `
+          <div class="bracket-slot">
+            ${logoMarkup(team.team, "compact-logo")}
+            <span>${escapeHtml(team.team)}</span>
+          </div>
+        `;
+      }
+
+      function bracketGroup(title, teams) {
+        const filledTeams = (Array.isArray(teams) ? teams : []).filter(Boolean);
+        const rows = filledTeams.length ? filledTeams.map(bracketSlot).join("") : bracketSlot("Takım");
+        return `
+          <div class="bracket-group">
+            <div class="bracket-tag">${escapeHtml(title)}</div>
+            ${rows}
+          </div>
+        `;
+      }
+
       function renderChampionsLeague() {
         const settings = normalizeLeagueSettings(state.leagueSettings);
         const container = document.querySelector("#championsLeagueSection .container");
@@ -3622,13 +3945,13 @@
         const playoffWinner = settings.playoffWinner || "Play-Off Kazananı";
         const championsGroups = settings.championsGroups;
         elements.championsGroupsGrid.innerHTML = Object.entries(championsGroups)
-          .map(([groupName, teams]) => groupCard(`Grup ${groupName}`, teams, "ŞAMPUANLAR LİGİ", "İlk sırayı alan takım üst tura yükselir."))
+          .map(([groupName, teams]) => bracketGroup(`GRUP ${groupName}`, teams))
           .join("");
         elements.championsPlayoffGrid.innerHTML = Object.entries(playoffGroups)
-          .map(([groupName, teams]) => groupCard(`Play-Off ${groupName}`, teams, "Play-Off bileti", "İki play-off grubundan toplam 1 takım ŞAMPUANLAR LİGİ hakkı kazanır."))
+          .map(([groupName, teams]) => bracketGroup(`PLAY-OFF ${groupName}`, teams))
           .join("");
         elements.playoffWinnerPanel.innerHTML = `
-          <div class="winner-label">ŞAMPUANLAR LİGİ Play-Off Kazananı</div>
+          <div class="winner-label">Play-Off Bileti</div>
           <div class="club">
             ${logoMarkup(playoffWinner)}
             <span>${escapeHtml(playoffWinner)}</span>
@@ -3636,29 +3959,21 @@
         `;
         const groupAWinner = championsGroups.A?.[0] || "Grup A Galibi";
         const groupBWinner = championsGroups.B?.[0] || "Grup B Galibi";
+        const finalWinner = settings.championsWinner || "Final Galibi";
         elements.championsFinalPath.innerHTML = `
-          <div class="winner-card">
-            <div class="winner-label">Grup A Galibi</div>
-            <div class="club">
-              ${logoMarkup(groupAWinner)}
-              <span>${escapeHtml(groupAWinner)}</span>
-            </div>
-          </div>
-          <div class="final-center">FİNAL</div>
-          <div class="winner-card">
-            <div class="winner-label">Grup B Galibi</div>
-            <div class="club">
-              ${logoMarkup(groupBWinner)}
-              <span>${escapeHtml(groupBWinner)}</span>
-            </div>
-          </div>
+          <div class="winner-label">Final Yolu</div>
+          <div class="club">${logoMarkup(groupAWinner)}<span>${escapeHtml(groupAWinner)}</span></div>
+          <div class="bracket-final-title">FİNAL</div>
+          <div class="club">${logoMarkup(groupBWinner)}<span>${escapeHtml(groupBWinner)}</span></div>
+          <div class="winner-label">Şampiyon</div>
+          <div class="club">${logoMarkup(finalWinner)}<span>${escapeHtml(finalWinner)}</span></div>
         `;
         elements.championsTrophyShowcase.innerHTML = `
-          ${trophyMarkup(settings.championsTrophy, settings.championsName)}
-          <div class="trophy-copy">
-            <h4>${escapeHtml(settings.championsName)} Kupası</h4>
-            <p>Finali kazanan takımın kaldıracağı özel kupa alanı. Admin buraya turnuva kupasının görselini ekleyebilir.</p>
-          </div>
+          ${
+            settings.championsTrophy
+              ? `<img src="${escapeHtml(settings.championsTrophy)}" alt="${escapeHtml(settings.championsName)} kupası">`
+              : `<span>ŞL</span>`
+          }
         `;
       }
 
@@ -3958,6 +4273,24 @@
         );
       });
 
+      elements.addQuizButton.addEventListener("click", () => {
+        openEditor(
+          "Soru-Cevap Ekle",
+          [
+            { name: "question", label: "Soru", required: true },
+            { name: "answer", label: "Cevap", required: true }
+          ],
+          async ({ question, answer }) => {
+            state.quiz.unshift({
+              question: question.trim(),
+              answer: answer.trim(),
+              createdAt: new Date().toISOString()
+            });
+            await commitChanges("Soru-cevap eklendi.");
+          }
+        );
+      });
+
       elements.savePosterButton.addEventListener("click", async () => {
         if (!state.isAdmin) return;
         state.fixturePoster = {
@@ -4138,6 +4471,13 @@
           if (!ok) return;
           state.news.splice(index, 1);
           await commitChanges("Haber silindi.");
+        }
+
+        if (action === "delete-quiz") {
+          const ok = confirm("Bu soru-cevap silinsin mi?");
+          if (!ok) return;
+          state.quiz.splice(index, 1);
+          await commitChanges("Soru-cevap silindi.");
         }
 
         if (action === "add-stat") {
